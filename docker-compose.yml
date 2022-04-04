@@ -5,6 +5,7 @@ services:
     tty: true
     stdin_open: true
     build:
+      context: .
       dockerfile: Dockerfile
     volumes:
       - ./:/project
