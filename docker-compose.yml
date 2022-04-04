@@ -1,15 +1,11 @@
 version: '3.4'
 
 services:
-  # gcc Release with Ninja
-  gcc-release-build:
+  naor-and-oren-image:
+    tty: true
+    stdin_open: true
     build:
-      context: .
       dockerfile: Dockerfile
-      target: build
-    environment:
-      CC: gcc
-      CXX: g++
-      TARGET: all
-      BUILD_TYPE: Release
-      CMAKE_GENERATOR: Ninja
+    volumes:
+      - ./:/project
+
