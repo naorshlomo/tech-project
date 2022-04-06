@@ -64,5 +64,3 @@ COPY . /project
 
 WORKDIR /project
 
-RUN make
-RUN ./ava

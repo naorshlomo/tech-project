@@ -12,6 +12,7 @@ services:
   worker-image:
     tty: true
     stdin_open: true
+    command: bash -c "make && ./ava"
     build:
       context: .
       dockerfile: Dockerfile-worker

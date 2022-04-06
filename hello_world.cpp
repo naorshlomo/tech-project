@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-using std::cout; using std::cin;
+using std::cout; using std::cin; using std::cerr;
 using std::endl; using std::string;
 
 int main() {
@@ -12,6 +12,7 @@ int main() {
     char *tmp;
     tmp = getenv("PATH");
     cout << "Current "<< endl << tmp << endl;
+    cerr << "err Current "<< endl << tmp << endl;
 
     return EXIT_SUCCESS;
 }
