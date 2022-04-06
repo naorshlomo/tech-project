@@ -1,3 +1,3 @@
 # tech-project
-docker-compose up --build -d && docker exec -it tech-project-naor-and-oren-image-1 /bin/bash
-docker-compose up -d ; docker exec -it tech-project_naor-and-oren-image_1 /bin/bash
+docker-compose up --build -d dev-image && docker exec -it tech-project_dev-image_1 /bin/bash
+docker-compose up --build --scale worker-image=3 worker-image

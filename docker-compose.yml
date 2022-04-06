@@ -1,12 +1,17 @@
 version: '3.4'
 
 services:
-  naor-and-oren-image:
+  dev-image:
     tty: true
     stdin_open: true
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-dev
     volumes:
       - ./:/project
-
+  worker-image:
+    tty: true
+    stdin_open: true
+    build:
+      context: .
+      dockerfile: Dockerfile-worker
