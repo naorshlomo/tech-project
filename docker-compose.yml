@@ -12,7 +12,8 @@ services:
   worker-image:
     tty: true
     stdin_open: true
-    command: bash -c "make && ./ava"
+    command: bash -c "make && ./avalanche"
     build:
       context: .
       dockerfile: Dockerfile-worker
+
