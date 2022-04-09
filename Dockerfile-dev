@@ -57,7 +57,19 @@ RUN \
   chmod +x /usr/local/bin/easy_install
 
 RUN apt-get autoremove
+RUN apt-get install -y --no-install-recommends iputils-ping
 
+#RUN git clone -c http.sslVerify=false https://github.com/grpc/grpc && \
+#    cd grpc && \
+#    git submodule update --init && \
+#    cd ./third_party/protobuf && \
+#    ./autogen.sh && \
+#    ./configure --prefix=/opt/protobuf && \
+#    make -j `nproc` && make install && \
+#    cd ../.. && \
+#    make -j `nproc` PROTOC=/opt/protobuf/bin/protoc && \
+#    make prefix=/opt/grpc install
+#
 # Add a /project volume
 VOLUME ["/project"]
 

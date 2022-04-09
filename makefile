@@ -1,9 +1,9 @@
 CC = g++
 OBJS = src/network/network.o src/utils/utils.o src/main.o src/worker.o
 EXEC = avalanche
-DEBUG_FLAG = -g
-COMP_FLAG = -Wall -Werror -pedantic-errors -std=c++11 -DBOOST_LOG_DYN_LINK
-LINK_FLAG = -lboost_log -lpthread
+DEBUG_FLAG = -g -pthread
+COMP_FLAG = -Wall -Werror -pedantic-errors -std=c++11 -DBOOST_LOG_DYN_LINK -lpthread
+LINK_FLAG = #-lboost_log -lpthread
 INCLUDE_FLAG = -I.
 
 $(EXEC) : $(OBJS)

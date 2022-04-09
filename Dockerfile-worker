@@ -59,7 +59,7 @@ RUN \
 
 RUN apt-get autoremove
 RUN apt-get install -y --no-install-recommends iputils-ping
-RUN apt-get install -y --no-install-recommends ilibboost-all-dev
+#RUN apt-get install -y --no-install-recommends ilibboost-all-dev
 
 RUN mkdir /project
 # Define working directory

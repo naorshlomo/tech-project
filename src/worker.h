@@ -12,9 +12,10 @@ class worker {
     color_t m_color;
 public:
     worker();
-    void accept(int round_number);
+    void accept_round(int round_number);
     void run_snowflake();
     void run_snowflake_loop(int round_number);
+    void query_answer();
 };
 
 #endif //TECH_PROJECT_WORKER_H
