@@ -1,0 +1,6 @@
+* add all the env vars
+* network part
+* attach id to each worker
+* check if it works with 1 round
+* add statistics and logs
+* check multiple rounds
