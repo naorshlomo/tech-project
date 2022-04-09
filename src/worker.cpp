@@ -7,6 +7,7 @@
 #include "src/utils/utils.h"
 #include <stdlib.h>
 #include <string>
+#include <iostream>
 
 worker::worker() {
     m_count = 0;
@@ -44,7 +45,8 @@ void worker::run_snowflake_loop(int round_number){
 }
 
 void worker::run_snowflake(){
-    int number_of_rounds = std::stoi(getenv("NUMBER_OF_ROUNDS"));
+    int number_of_rounds = std::stoi(std::string(getenv("NUMBER_OF_ROUNDS")));
+    std::cout<< "number of rounds" << number_of_rounds << std::endl;
     for (int i = 0; i < number_of_rounds ; ++i) {
         run_snowflake_loop(i);
     }
