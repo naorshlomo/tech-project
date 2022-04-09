@@ -10,6 +10,7 @@ RUN \
     libssl-dev \
     openssl \
     libtool \
+    net-tools \
     autoconf \
     automake \
     build-essential \
@@ -57,10 +58,14 @@ RUN \
   chmod +x /usr/local/bin/easy_install
 
 RUN apt-get autoremove
+RUN apt-get install -y --no-install-recommends iputils-ping
+RUN apt-get install -y --no-install-recommends ilibboost-all-dev
 
 RUN mkdir /project
 # Define working directory
 COPY . /project
+
+SHELL ["/bin/bash", "-c"]
 
 WORKDIR /project
 

@@ -20,3 +20,58 @@ services:
       dockerfile: Dockerfile-worker
     env_file:
       - src/service-variables.env
+  worker-image-1:
+    tty: true
+    stdin_open: true
+    command: bash -c "make && ./avalanche"
+    #command: bash -c "ping 192.168.55.3"
+    networks:
+      worker_net:
+        ipv4_address: 192.168.55.2
+    environment: 
+      - IP=192.168.55.2
+    build:
+      context: .
+      dockerfile: Dockerfile-worker
+    env_file:
+      - src/service-variables.env
+  worker-image-2:
+    tty: true
+    stdin_open: true
+    command: bash -c "make && ./avalanche"
+    #command: bash -c "ping 192.168.55.2"
+    networks:
+      worker_net:
+        ipv4_address: 192.168.55.3
+    environment: 
+      - IP=192.168.55.3
+    build:
+      context: .
+      dockerfile: Dockerfile-worker
+    env_file:
+      - src/service-variables.env
+  worker-image-3:
+    tty: true
+    stdin_open: true
+    command: bash -c "make && ./avalanche"
+    #command: bash -c "ping 192.168.55.2"
+    networks:
+      worker_net:
+        ipv4_address: 192.168.55.4
+    environment: 
+      - IP=192.168.55.4
+    build:
+      context: .
+      dockerfile: Dockerfile-worker
+    env_file:
+      - src/service-variables.env
+
+
+networks:
+  worker_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.55.0/24
+          gateway: 192.168.55.1

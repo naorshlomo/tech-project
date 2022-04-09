@@ -46,6 +46,10 @@ void worker::run_snowflake_loop(int round_number){
 }
 
 void worker::run_snowflake(){
+    print_log("test");
+    int k_sample_size = std::stoi(std::string(getenv("K_SAMPLE_SIZE"))); // TODO ask oren if we want to define it in utils?
+    auto k_sample_list = Sample("1", k_sample_size); // TODO change to "m_id"
+    return;
     int number_of_rounds = std::stoi(std::string(getenv("NUMBER_OF_ROUNDS")));
     std::cout<< "number of rounds" << number_of_rounds << std::endl;
     for (int i = 0; i < number_of_rounds ; ++i) {
