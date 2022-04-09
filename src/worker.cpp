@@ -23,9 +23,10 @@ void worker::run_snowflake_loop(int round_number){
     double alpha = std::stod(std::string(getenv("ALPHA"))); // TODO ask oren if we want to define it in utils?
     int beta = std::stoi(std::string(getenv("BETA"))); // TODO ask oren if we want to define it in utils?
     while (true){
+        std::cout<< "in the while" << std::endl;
         auto k_sample_list = Sample("1", k_sample_size); // TODO change to "m_id"
         auto sample_results = QueryAll(k_sample_list, round_number);
-        for (auto color: colors) {
+        for (auto color : colors) {
             int count = CountSampleResults(sample_results, color);
             if (count >=  alpha * k_sample_size){
                 if (color != m_color){
