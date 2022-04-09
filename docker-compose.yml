@@ -9,6 +9,9 @@ services:
       dockerfile: Dockerfile-dev
     volumes:
       - ./:/project
+    env_file:
+      - src/service-variables.env
+
   worker-image:
     tty: true
     stdin_open: true
@@ -16,4 +19,5 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-worker
-
+    env_file:
+      - src/service-variables.env

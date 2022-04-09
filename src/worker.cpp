@@ -18,9 +18,9 @@ void worker::accept(int round_number){
 }
 
 void worker::run_snowflake_loop(int round_number){
-    int k_sample_size = 10; // TODO change k_sample_size to env variable
-    double alpha = 0.5; // TODO change alpha to env variable
-    int beta = 5; // TODO change beta to env variable
+    int k_sample_size = std::stoi(getenv("K_SAMPLE_SIZE")); // TODO ask oren if we want to define it in utils?
+    double alpha = std::stod(getenv("ALPHA")); // TODO ask oren if we want to define it in utils?
+    int beta = std::stoi(getenv("BETA")); // TODO ask oren if we want to define it in utils?
     while (true){
         auto k_sample_list = Sample("1", k_sample_size); // TODO change to "m_id"
         auto sample_results = QueryAll(k_sample_list, round_number);
@@ -44,7 +44,7 @@ void worker::run_snowflake_loop(int round_number){
 }
 
 void worker::run_snowflake(){
-    int number_of_rounds = 1; // TODO change number_of_rounds to env variable
+    int number_of_rounds = std::stoi(getenv("NUMBER_OF_ROUNDS"));
     for (int i = 0; i < number_of_rounds ; ++i) {
         run_snowflake_loop(i);
     }
