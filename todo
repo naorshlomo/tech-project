@@ -1,4 +1,4 @@
-* add all the env vars
+* add all the env vars - DONE
 * network part
 * attach id to each worker
 * check if it works with 1 round
