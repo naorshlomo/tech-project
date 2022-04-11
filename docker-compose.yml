@@ -24,6 +24,7 @@ services:
     tty: true
     stdin_open: true
     command: bash -c "make && ./avalanche"
+    #command: bash -c "make && valgrind -v ./avalanche"
     #command: bash -c "ping 192.168.55.3"
     networks:
       worker_net:
@@ -39,6 +40,7 @@ services:
     tty: true
     stdin_open: true
     command: bash -c "make && ./avalanche"
+    #command: bash -c "make && valgrind -v ./avalanche"
     #command: bash -c "ping 192.168.55.2"
     networks:
       worker_net:
@@ -54,6 +56,7 @@ services:
     tty: true
     stdin_open: true
     command: bash -c "make && ./avalanche"
+    #command: bash -c "make && valgrind -v ./avalanche"
     #command: bash -c "ping 192.168.55.2"
     networks:
       worker_net:
@@ -65,6 +68,40 @@ services:
       dockerfile: Dockerfile-worker
     env_file:
       - src/service-variables.env
+  worker-image-4:
+    tty: true
+    stdin_open: true
+    command: bash -c "make && ./avalanche"
+    #command: bash -c "make && valgrind -v ./avalanche"
+    #command: bash -c "ping 192.168.55.2"
+    networks:
+      worker_net:
+        ipv4_address: 192.168.55.5
+    environment: 
+      - IP=192.168.55.5
+    build:
+      context: .
+      dockerfile: Dockerfile-worker
+    env_file:
+      - src/service-variables.env
+  worker-image-5:
+    tty: true
+    stdin_open: true
+    command: bash -c "make && ./avalanche"
+    #command: bash -c "make && valgrind -v ./avalanche"
+    #command: bash -c "ping 192.168.55.2"
+    networks:
+      worker_net:
+        ipv4_address: 192.168.55.6
+    environment: 
+      - IP=192.168.55.6
+    build:
+      context: .
+      dockerfile: Dockerfile-worker
+    env_file:
+      - src/service-variables.env
+
+
 
 
 networks:

@@ -6,10 +6,12 @@
 #define TECH_PROJECT_WORKER_H
 
 #include "src/utils/utils.h"
+#include <atomic>
 
 class worker {
     int m_count;
-    color_t m_color;
+    int m_test;
+    color_t m_color; //TODO think about sync
 public:
     worker();
     void accept_round(int round_number);

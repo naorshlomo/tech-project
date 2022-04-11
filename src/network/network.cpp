@@ -17,7 +17,12 @@
 #include <unistd.h>
 #define PORT 8080
 
-std::vector<std::string> ip_list = {"192.168.55.2", "192.168.55.3", "192.168.55.4"};
+std::vector<std::string> ip_list = {"192.168.55.2", 
+	                            "192.168.55.3", 
+				    "192.168.55.4",
+				    "192.168.55.5",
+				    "192.168.55.6"
+                                   };
 
 void log_sample(std::vector<std::string> result) {
     std::stringstream ss;
@@ -33,9 +38,9 @@ std::vector<std::string> Sample(std::string current, int k_sample_size){
     std::vector<std::string> result;
 
     std::vector<std::string>::iterator position = std::find(ip_list.begin(), ip_list.end(), std::string(getenv("IP")));
-    //if (position != ip_list.end()) {
-    ip_list.erase(position);
-    //}
+    if (position != ip_list.end()) {
+        ip_list.erase(position);
+    }
     std::mt19937 engine;
     auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
     engine.seed((unsigned long)seed);
@@ -43,7 +48,7 @@ std::vector<std::string> Sample(std::string current, int k_sample_size){
     for (int i = 0; i < k_sample_size; i++) {
         result.push_back(ip_list[i]);
     }
-    log_sample(result);
+    //log_sample(result);
     return result;
 }
 
@@ -55,13 +60,13 @@ color_t query(std::string addr, int round_number) {
     char buffer[1024] = { 0 };
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         printf("\n Socket creation error \n");
-        return (color_t)0;
+        return (color_t)-1;
     }
  
     serv_addr.sin_family = AF_INET;
 
     auto last_addr = (int) (addr.back() - '0');
-    serv_addr.sin_port = htons(PORT + last_addr);
+    serv_addr.sin_port = htons(PORT + last_addr); // TODO probably don't need the last_addr
  
     // Convert IPv4 and IPv6 addresses from text to binary
     // form
@@ -69,7 +74,7 @@ color_t query(std::string addr, int round_number) {
         <= 0) {
         printf(
             "\nInvalid address/ Address not supported \n");
-        return (color_t)0;
+        return (color_t)-1;
     }
  
     //printf("connect %s at %d\n", addr.c_str(), PORT+last_addr);
@@ -77,19 +82,22 @@ color_t query(std::string addr, int round_number) {
                 sizeof(serv_addr))
         < 0) {
         printf("\nConnection Failed \n");
-        return (color_t)0;
+        return (color_t)-1;
     }
     //printf("connected %s at %d\n", addr.c_str(), PORT+last_addr);
     send(sock, hello.c_str(), strlen(hello.c_str()), 0);
     read(sock, buffer, 1024);
-    printf("recieved color %d from %s\n", (int) (buffer[0] - '0'), addr.c_str());
-    return (color_t)buffer[0];
+    //printf("recieved color %d from %s\n", (int) (buffer[0] - '0'), addr.c_str());
+    return (color_t)(buffer[0] - '0');
 } 
 
 std::map<std::string, color_t> QueryAll(std::vector<std::string> sample_list, int round_number){
     std::map<std::string, color_t>  result;
     for (auto node: sample_list) {
-        result[node] = query(node, round_number);
+	auto query_result = query(node, round_number);
+	if (query_result != -1) {
+            result[node] = query_result;
+	}
     }
     return result;
 }

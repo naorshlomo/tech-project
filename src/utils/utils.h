@@ -8,7 +8,7 @@
 #include <string>
 typedef enum color {
     RED=0,
-    BLUE
+    BLUE=1
 } color_t;
 static const color_t colors[] = {RED, BLUE};
 int CountSampleResults(std::map<std::string, color_t > sample_results, color_t color);

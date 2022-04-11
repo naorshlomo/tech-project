@@ -22,6 +22,7 @@
 
 worker::worker() {
     m_count = 0;
+    m_test = 0;
     auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
     std::srand(seed);
     m_color = (color_t) (rand() % 2);
@@ -29,7 +30,7 @@ worker::worker() {
 
 void worker::accept_round(int round_number){
     print_log("round number:" + std::to_string(round_number) + ", color: " + std::to_string((int) m_color));
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 }
 
 void worker::query_answer() {
@@ -37,8 +38,8 @@ void worker::query_answer() {
     int addrlen = sizeof(address);
     char buffer[1024] = { 0 };
     int opt = 1;
-    int master_socket , new_socket , client_socket[30] ,
-          max_clients = 30 , activity, i , valread , sd;
+    int master_socket , new_socket , client_socket[300] ,
+          max_clients = 300 , activity, i , valread , sd;
     int max_sd;
     fd_set readfds;
  
@@ -76,7 +77,7 @@ void worker::query_answer() {
         perror("bind failed");
         exit(EXIT_FAILURE);
     }
-    if (listen(master_socket, 30) < 0) {
+    if (listen(master_socket, 300) < 0) {
         perror("listen");
         exit(EXIT_FAILURE);
     }
@@ -168,6 +169,7 @@ void worker::query_answer() {
                     //set the string terminating NULL byte on the end 
                     //of the data read 
                     //printf("%s send color %d\n", ip.c_str(), (int)m_color);
+                    //printf("test is %d\n", (int)m_test);
 
                     std::string msg = std::to_string(m_color);
                     send(sd, msg.c_str(), strlen(msg.c_str()), 0);
@@ -184,22 +186,29 @@ void worker::run_snowflake_loop(int round_number){
     int k_sample_size = std::stoi(std::string(getenv("K_SAMPLE_SIZE"))); // TODO ask oren if we want to define it in utils?
     double alpha = std::stod(std::string(getenv("ALPHA"))); // TODO ask oren if we want to define it in utils?
     int beta = std::stoi(std::string(getenv("BETA"))); // TODO ask oren if we want to define it in utils?
+    m_test = 1;
+    //printf("change test to %d\n", (int)m_test);
     while (true){
-        //std::cout<< "in the while" << std::endl;
         auto k_sample_list = Sample("1", k_sample_size); // TODO change to "m_id"
         auto sample_results = QueryAll(k_sample_list, round_number);
+        //std::cout<< "finish query" << std::endl;
         for (auto color : colors) {
+            //std::cout<< "count" << std::endl;
             int count = CountSampleResults(sample_results, color);
+            //std::cout<< "finish count " << count << std::endl;
             if (count >=  alpha * k_sample_size){
+                //std::cout<< "check color" << std::endl;
                 if (color != m_color){
                     m_color = color;
+                    //std::cout<< "change color" << std::endl;
                     m_count = 0;
                 }
                 else {
                     m_count++;
+                    //std::cout<< "count color " << m_count << std::endl;
                     if(m_count > beta){
-                        std::cout<< "finished round" << std::endl;
-                        //accept_round(round_number);
+                        //std::cout<< "finished round" << std::endl;
+                        accept_round(round_number);
                         return;
                     }
                 }
@@ -214,11 +223,11 @@ void worker::run_snowflake(){
     //std::thread query_thread (worker::query_answer);
     //print_log("test");
     //int k_sample_size = std::stoi(std::string(getenv("K_SAMPLE_SIZE"))); // TODO ask oren if we want to define it in utils?
-    //auto k_sample_list = Sample("1", k_sample_size); // TODO change to "m_id"
+    //auto k_sample_list = Sample("1", 1); // TODO change to "m_id"
     //QueryAll(k_sample_list, 1);
-    //return;
+    //exit(0);
     int number_of_rounds = std::stoi(std::string(getenv("NUMBER_OF_ROUNDS")));
-    std::cout<< "number of rounds" << number_of_rounds << std::endl;
+    //std::cout<< "number of rounds" << number_of_rounds << std::endl;
     for (int i = 0; i < number_of_rounds ; ++i) {
         run_snowflake_loop(i);
     }
