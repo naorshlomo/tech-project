@@ -48,6 +48,7 @@ std::vector<std::string> Sample(std::string current, int k_sample_size){
 }
 
 color_t query(std::string addr, int round_number) {
+    //printf("query %s \n", addr.c_str());
     int sock = 0;
     struct sockaddr_in serv_addr;
     std::string hello = "Hello from client";
@@ -58,7 +59,9 @@ color_t query(std::string addr, int round_number) {
     }
  
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(PORT);
+
+    auto last_addr = (int) (addr.back() - '0');
+    serv_addr.sin_port = htons(PORT + last_addr);
  
     // Convert IPv4 and IPv6 addresses from text to binary
     // form
@@ -69,15 +72,17 @@ color_t query(std::string addr, int round_number) {
         return (color_t)0;
     }
  
+    //printf("connect %s at %d\n", addr.c_str(), PORT+last_addr);
     if (connect(sock, (struct sockaddr*)&serv_addr,
                 sizeof(serv_addr))
         < 0) {
         printf("\nConnection Failed \n");
         return (color_t)0;
     }
+    //printf("connected %s at %d\n", addr.c_str(), PORT+last_addr);
     send(sock, hello.c_str(), strlen(hello.c_str()), 0);
     read(sock, buffer, 1024);
-    printf("recieved color %d\n", (int)buffer[0]);
+    printf("recieved color %d from %s\n", (int) (buffer[0] - '0'), addr.c_str());
     return (color_t)buffer[0];
 } 
 
