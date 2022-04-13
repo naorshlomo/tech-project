@@ -25,12 +25,12 @@ services:
     stdin_open: true
     command: bash -c "make && ./avalanche"
     #command: bash -c "make && valgrind -v ./avalanche"
-    #command: bash -c "ping 192.168.55.3"
+    #command: bash -c "ping 172.17.0.3"
     networks:
       worker_net:
-        ipv4_address: 192.168.55.2
+        ipv4_address: 172.17.0.2
     environment: 
-      - IP=192.168.55.2
+      - MY_POD_IP=172.17.0.2
     build:
       context: .
       dockerfile: Dockerfile-worker
@@ -41,12 +41,12 @@ services:
     stdin_open: true
     command: bash -c "make && ./avalanche"
     #command: bash -c "make && valgrind -v ./avalanche"
-    #command: bash -c "ping 192.168.55.2"
+    #command: bash -c "ping 172.17.0.2"
     networks:
       worker_net:
-        ipv4_address: 192.168.55.3
+        ipv4_address: 172.17.0.3
     environment: 
-      - IP=192.168.55.3
+      - MY_POD_IP=172.17.0.3
     build:
       context: .
       dockerfile: Dockerfile-worker
@@ -57,12 +57,12 @@ services:
     stdin_open: true
     command: bash -c "make && ./avalanche"
     #command: bash -c "make && valgrind -v ./avalanche"
-    #command: bash -c "ping 192.168.55.2"
+    #command: bash -c "ping 172.17.0.2"
     networks:
       worker_net:
-        ipv4_address: 192.168.55.4
+        ipv4_address: 172.17.0.4
     environment: 
-      - IP=192.168.55.4
+      - MY_POD_IP=172.17.0.4
     build:
       context: .
       dockerfile: Dockerfile-worker
@@ -73,12 +73,12 @@ services:
     stdin_open: true
     command: bash -c "make && ./avalanche"
     #command: bash -c "make && valgrind -v ./avalanche"
-    #command: bash -c "ping 192.168.55.2"
+    #command: bash -c "ping 172.17.0.2"
     networks:
       worker_net:
-        ipv4_address: 192.168.55.5
+        ipv4_address: 172.17.0.5
     environment: 
-      - IP=192.168.55.5
+      - MY_POD_IP=172.17.0.5
     build:
       context: .
       dockerfile: Dockerfile-worker
@@ -89,12 +89,12 @@ services:
     stdin_open: true
     command: bash -c "make && ./avalanche"
     #command: bash -c "make && valgrind -v ./avalanche"
-    #command: bash -c "ping 192.168.55.2"
+    #command: bash -c "ping 172.17.0.2"
     networks:
       worker_net:
-        ipv4_address: 192.168.55.6
+        ipv4_address: 172.17.0.6
     environment: 
-      - IP=192.168.55.6
+      - MY_POD_IP=172.17.0.6
     build:
       context: .
       dockerfile: Dockerfile-worker
@@ -110,5 +110,5 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 192.168.55.0/24
-          gateway: 192.168.55.1
+        - subnet: 172.17.0.0/24
+          gateway: 172.17.0.1

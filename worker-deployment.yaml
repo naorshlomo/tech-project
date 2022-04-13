@@ -6,7 +6,7 @@ metadata:
     app: worker-yaml
 spec:
   serviceName: worker
-  replicas: 2
+  replicas: 5
   selector:
     matchLabels:
       app: worker-yaml
@@ -24,9 +24,9 @@ spec:
             - '-c'
           args:
             - >-
-              while true; do echo -en '\n'; make; printenv MY_NODE_NAME MY_POD_NAME
-              MY_POD_NAMESPACE; printenv MY_POD_IP MY_POD_SERVICE_ACCOUNT; sleep
-              10; done;
+              make;
+              printenv MY_NODE_NAME MY_POD_NAME
+              MY_POD_NAMESPACE; printenv MY_POD_IP MY_POD_SERVICE_ACCOUNT; ./avalanche;
           env:
             - name: MY_NODE_NAME
               valueFrom:
@@ -53,6 +53,14 @@ spec:
                 fieldRef:
                   apiVersion: v1
                   fieldPath: spec.serviceAccountName
+            - name: NUMBER_OF_ROUNDS
+              value: "5"
+            - name: K_SAMPLE_SIZE
+              value: "3"
+            - name: ALPHA
+              value: "0.6"
+            - name: BETA
+              value: "5"
           resources: { }
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File

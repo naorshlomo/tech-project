@@ -17,11 +17,11 @@
 #include <unistd.h>
 #define PORT 8080
 
-std::vector<std::string> ip_list = {"192.168.55.2", 
-	                            "192.168.55.3", 
-				    "192.168.55.4",
-				    "192.168.55.5",
-				    "192.168.55.6"
+std::vector<std::string> ip_list = {"172.17.0.2",
+	                            "172.17.0.3",
+                                "172.17.0.4",
+				    "172.17.0.5",
+				    "172.17.0.6"
                                    };
 
 void log_sample(std::vector<std::string> result) {
@@ -31,12 +31,11 @@ void log_sample(std::vector<std::string> result) {
         ss << "\t" << res << "\n";
     }
     print_log(ss.str());
-
 }
 
 std::vector<std::string> Sample(int k_sample_size) {
     std::vector<std::string> result;
-    std::vector<std::string>::iterator position = std::find(ip_list.begin(), ip_list.end(), std::string(getenv("IP")));
+    std::vector<std::string>::iterator position = std::find(ip_list.begin(), ip_list.end(), std::string(getenv("MY_POD_IP")));
     if (position != ip_list.end()) {
         ip_list.erase(position);
     }
@@ -67,7 +66,7 @@ color_t query(std::string addr, int round_number) {
     }
  
     if (connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
-        printf("\nConnection Failed \n");
+//        printf("\nConnection Failed \n");
         return (color_t)-1;
     }
     send(sock, std::to_string(round_number).c_str(), strlen(std::to_string(round_number).c_str()), 0);
