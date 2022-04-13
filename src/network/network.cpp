@@ -75,6 +75,17 @@ color_t query(std::string addr, int round_number) {
     return (color_t)(buffer[0] - '0');
 } 
 
+std::map<std::string, color_t> QueryAll(std::vector<std::string> sample_list, int round_number) {
+    std::map<std::string, color_t>  result;
+    for (auto node: sample_list) {
+	auto query_result = query(node, round_number);
+	if (query_result != -1) {
+            result[node] = query_result;
+	}
+    }
+    return result;
+}
+
 int getQuerySocket(int max_clients) {
     struct sockaddr_in address;
     int opt = 1;
@@ -112,15 +123,4 @@ int getQuerySocket(int max_clients) {
         exit(EXIT_FAILURE);
     }
     return master_socket;
-}
-
-std::map<std::string, color_t> QueryAll(std::vector<std::string> sample_list, int round_number){
-    std::map<std::string, color_t>  result;
-    for (auto node: sample_list) {
-	auto query_result = query(node, round_number);
-	if (query_result != -1) {
-            result[node] = query_result;
-	}
-    }
-    return result;
 }

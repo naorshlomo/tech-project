@@ -21,14 +21,17 @@
 #define PORT 8080
 
 worker::worker() {
-    m_count = 0;
-    auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-    std::srand(seed);
-    m_color = (color_t) (rand() % 2);
+    int number_of_rounds = std::stoi(std::string(getenv("NUMBER_OF_ROUNDS")));
+    for (int i = 0; i < number_of_rounds; i++) {
+        m_count[i] = 0;
+        auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+        std::srand(seed);
+        m_colors[i] = (color_t) (rand() % 2);
+    }
 }
 
 void worker::accept_round(int round_number){
-    print_log("Accepted color: " + std::to_string((int) m_color) + " in round number:" + std::to_string(round_number));
+    print_log("Accepted color: " + std::to_string((int) m_colors.at(round_number)) + " in round number:" + std::to_string(round_number));
 }
 
 void worker::queryAnswer() {
@@ -76,7 +79,9 @@ void worker::queryAnswer() {
                     close(sd);  
                     client_socket[i] = 0;  
                 } else {  
-                    std::string msg = std::to_string(m_color);
+                    buffer[valread] = '\0';
+                    int requested_round = atoi(buffer);
+                    std::string msg = std::to_string(m_colors.at(requested_round));
                     send(sd, msg.c_str(), strlen(msg.c_str()), 0);
                 }  
             }  
@@ -97,13 +102,13 @@ void worker::run_snowflake_loop(int round_number){
         for (auto color : colors) {
             int count = CountSampleResults(sample_results, color);
             if (count >=  alpha * k_sample_size){
-                if (color != m_color){
-                    m_color = color;
-                    m_count = 0;
+                if (color != m_colors.at(round_number)){
+                    m_colors[round_number] = color;
+                    m_count[round_number] = 0;
                 }
                 else {
-                    m_count++;
-                    if(m_count > beta){
+                    m_count[round_number]++;
+                    if(m_count[round_number] > beta){
                         accept_round(round_number);
                         return;
                     }

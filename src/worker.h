@@ -9,8 +9,8 @@
 #include <atomic>
 
 class worker {
-    int m_count;
-    color_t m_color;
+    std::map<int, int> m_count;
+    std::map<int, color_t> m_colors;
 public:
     worker();
     void accept_round(int round_number);
