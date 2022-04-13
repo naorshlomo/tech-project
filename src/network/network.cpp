@@ -34,9 +34,8 @@ void log_sample(std::vector<std::string> result) {
 
 }
 
-std::vector<std::string> Sample(std::string current, int k_sample_size){
+std::vector<std::string> Sample(int k_sample_size) {
     std::vector<std::string> result;
-
     std::vector<std::string>::iterator position = std::find(ip_list.begin(), ip_list.end(), std::string(getenv("IP")));
     if (position != ip_list.end()) {
         ip_list.erase(position);
@@ -53,43 +52,67 @@ std::vector<std::string> Sample(std::string current, int k_sample_size){
 }
 
 color_t query(std::string addr, int round_number) {
-    //printf("query %s \n", addr.c_str());
     int sock = 0;
     struct sockaddr_in serv_addr;
-    std::string hello = "Hello from client";
-    char buffer[1024] = { 0 };
+    char buffer[1] = {0};
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         printf("\n Socket creation error \n");
         return (color_t)-1;
     }
- 
     serv_addr.sin_family = AF_INET;
-
-    auto last_addr = (int) (addr.back() - '0');
-    serv_addr.sin_port = htons(PORT + last_addr); // TODO probably don't need the last_addr
- 
-    // Convert IPv4 and IPv6 addresses from text to binary
-    // form
-    if (inet_pton(AF_INET, addr.c_str(), &serv_addr.sin_addr)
-        <= 0) {
-        printf(
-            "\nInvalid address/ Address not supported \n");
+    serv_addr.sin_port = htons(PORT);
+    if (inet_pton(AF_INET, addr.c_str(), &serv_addr.sin_addr) <= 0) {
+        printf("\nInvalid address/ Address not supported \n");
         return (color_t)-1;
     }
  
-    //printf("connect %s at %d\n", addr.c_str(), PORT+last_addr);
-    if (connect(sock, (struct sockaddr*)&serv_addr,
-                sizeof(serv_addr))
-        < 0) {
+    if (connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
         printf("\nConnection Failed \n");
         return (color_t)-1;
     }
-    //printf("connected %s at %d\n", addr.c_str(), PORT+last_addr);
-    send(sock, hello.c_str(), strlen(hello.c_str()), 0);
-    read(sock, buffer, 1024);
-    //printf("recieved color %d from %s\n", (int) (buffer[0] - '0'), addr.c_str());
+    send(sock, std::to_string(round_number).c_str(), strlen(std::to_string(round_number).c_str()), 0);
+    read(sock, buffer, 1);
     return (color_t)(buffer[0] - '0');
 } 
+
+int getQuerySocket(int max_clients) {
+    struct sockaddr_in address;
+    int opt = 1;
+    int master_socket;
+ 
+    //initialise all client_socket[] to 0 so not checked
+
+    // Creating socket file descriptor
+    if ((master_socket = socket(AF_INET, SOCK_STREAM, 0))
+        == 0) {
+        perror("socket failed");
+        exit(EXIT_FAILURE);
+    }
+ 
+    // Forcefully attaching socket to the port 8080
+    if (setsockopt(master_socket, SOL_SOCKET,
+                   SO_REUSEADDR | SO_REUSEPORT, &opt,
+                   sizeof(opt))) {
+        perror("setsockopt");
+        exit(EXIT_FAILURE);
+    }
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_port = htons(PORT);
+ 
+    // Forcefully attaching socket to the port 8080
+    if (bind(master_socket, (struct sockaddr*)&address,
+             sizeof(address))
+        < 0) {
+        perror("bind failed");
+        exit(EXIT_FAILURE);
+    }
+    if (listen(master_socket, 300) < 0) {
+        perror("listen");
+        exit(EXIT_FAILURE);
+    }
+    return master_socket;
+}
 
 std::map<std::string, color_t> QueryAll(std::vector<std::string> sample_list, int round_number){
     std::map<std::string, color_t>  result;

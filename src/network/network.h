@@ -10,9 +10,8 @@
 #include <vector>
 #include <string>
 
-
-
-std::vector<std::string> Sample(std::string current, int k_sample_size);
+int getQuerySocket(int max_clients);
+std::vector<std::string> Sample(int k_sample_size);
 std::map<std::string, color_t> QueryAll(std::vector<std::string> sample_list, int round_number);
 
 #endif //TECH_PROJECT_NETWORK_H
