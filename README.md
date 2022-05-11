@@ -9,3 +9,6 @@ docker-compose up --build worker-image-1 worker-image-2 worker-image-3 worker-im
 # kubernetes
 - minikube start --insecure-registry true #running the cluster
 - kubectl apply -f worker-deployment.yaml #running the deployments
+
+
+exec kubectl exec -i -t -n default worker-envars-fieldref-statefulset-0 -c tech-project-worker-image-z26m4 "--" sh -c "clear; (bash || ash || sh)"

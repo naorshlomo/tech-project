@@ -61,6 +61,9 @@ RUN apt-get autoremove
 RUN apt-get install -y --no-install-recommends iputils-ping
 #RUN apt-get install -y --no-install-recommends ilibboost-all-dev
 
+RUN apt-get install -y --no-install-recommends python-pip
+RUN pip install kubernetes
+
 RUN mkdir /project
 # Define working directory
 COPY . /project

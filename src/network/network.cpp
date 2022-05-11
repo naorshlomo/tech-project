@@ -45,7 +45,7 @@ std::string lookup_host (const char *host)
         return "";
     }
     res = result;
-    printf ("Host: %s\n", host);
+    // printf ("Host: %s\n", host);
     while (res) {
         inet_ntop (res->ai_family, res->ai_addr->sa_data, addrstr, 100);
         switch (res->ai_family) {
@@ -58,8 +58,8 @@ std::string lookup_host (const char *host)
         }
         inet_ntop (res->ai_family, ptr, addrstr, 100);
         return_value = std::string(addrstr);
-        printf ("IPv%d address: %s (%s)\n", res->ai_family == PF_INET6 ? 6 : 4,
-                addrstr, res->ai_canonname);
+        //printf ("IPv%d address: %s (%s)\n", res->ai_family == PF_INET6 ? 6 : 4,
+        //        addrstr, res->ai_canonname);
         res = res->ai_next;
     }
 
