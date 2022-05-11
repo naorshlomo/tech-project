@@ -3,10 +3,10 @@ kind: Service
 metadata:
   name: worker
   labels:
-    your_label: worker-headless-label
+    app: worker-yaml
 spec:
   selector:
-    your_label: worker-headless-label
+    app: worker-yaml
   ports:
     - port: 80
       name: transport

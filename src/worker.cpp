@@ -20,7 +20,7 @@
 #include <unistd.h>
 #define PORT 8080
 
-worker::worker() {
+worker::worker(){
     int number_of_rounds = std::stoi(std::string(getenv("NUMBER_OF_ROUNDS")));
     for (int i = 0; i < number_of_rounds; i++) {
         m_count[i] = 0;

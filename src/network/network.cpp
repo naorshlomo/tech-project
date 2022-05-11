@@ -15,14 +15,57 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <netdb.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
 #define PORT 8080
 
-std::vector<std::string> ip_list = {"172.17.0.2",
-	                            "172.17.0.3",
-                                "172.17.0.4",
-				    "172.17.0.5",
-				    "172.17.0.6"
-                                   };
+std::vector<std::string> host_list;
+
+std::string lookup_host (const char *host)
+{
+    struct addrinfo hints, *res, *result;
+    int errcode;
+    char addrstr[100] = {0};
+    void *ptr;
+    std::string return_value;
+
+    memset (&hints, 0, sizeof (hints));
+    hints.ai_family = PF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags |= AI_CANONNAME;
+
+    errcode = getaddrinfo (host, NULL, &hints, &result);
+    if (errcode != 0) {
+        perror ("getaddrinfo");
+        return "";
+    }
+    res = result;
+    printf ("Host: %s\n", host);
+    while (res) {
+        inet_ntop (res->ai_family, res->ai_addr->sa_data, addrstr, 100);
+        switch (res->ai_family) {
+            case AF_INET:
+                ptr = &((struct sockaddr_in *) res->ai_addr)->sin_addr;
+                break;
+            case AF_INET6:
+                ptr = &((struct sockaddr_in6 *) res->ai_addr)->sin6_addr;
+                break;
+        }
+        inet_ntop (res->ai_family, ptr, addrstr, 100);
+        return_value = std::string(addrstr);
+        printf ("IPv%d address: %s (%s)\n", res->ai_family == PF_INET6 ? 6 : 4,
+                addrstr, res->ai_canonname);
+        res = res->ai_next;
+    }
+
+    freeaddrinfo(result);
+    return return_value;
+}
 
 void log_sample(std::vector<std::string> result) {
     std::stringstream ss;
@@ -35,16 +78,16 @@ void log_sample(std::vector<std::string> result) {
 
 std::vector<std::string> Sample(int k_sample_size) {
     std::vector<std::string> result;
-    std::vector<std::string>::iterator position = std::find(ip_list.begin(), ip_list.end(), std::string(getenv("MY_POD_IP")));
-    if (position != ip_list.end()) {
-        ip_list.erase(position);
+    std::vector<std::string>::iterator position = std::find(host_list.begin(), host_list.end(), std::string(getenv("MY_POD_IP")));
+    if (position != host_list.end()) {
+        host_list.erase(position);
     }
     std::mt19937 engine;
     auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
     engine.seed((unsigned long)seed);
-    std::shuffle(ip_list.begin(), ip_list.end(), engine);
+    std::shuffle(host_list.begin(), host_list.end(), engine);
     for (int i = 0; i < k_sample_size; i++) {
-        result.push_back(ip_list[i]);
+        result.push_back(host_list[i]);
     }
     //log_sample(result);
     return result;
@@ -77,10 +120,11 @@ color_t query(std::string addr, int round_number) {
 std::map<std::string, color_t> QueryAll(std::vector<std::string> sample_list, int round_number) {
     std::map<std::string, color_t>  result;
     for (auto node: sample_list) {
-	auto query_result = query(node, round_number);
-	if (query_result != -1) {
-            result[node] = query_result;
-	}
+        auto addr = lookup_host(node.c_str());
+	    auto query_result = query(addr, round_number);
+	    if (query_result != -1) {
+                result[node] = query_result;
+	    }
     }
     return result;
 }

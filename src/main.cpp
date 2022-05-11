@@ -4,14 +4,22 @@
 
 #include "worker.h"
 #include "utils/utils.h"
+#include "network/network.h"
 #include <thread>
 #include <chrono>
+
+
 
 void QueryAnswerThread(worker& a) {
     a.queryAnswer();
 }
 
 int main() {
+    for (int i = 0; i < std::stoi(std::string(getenv("REPLICAS"))) ; ++i) {
+        std::string new_host = "worker-envars-fieldref-statefulset-" + std::to_string(i) + ".worker.default.svc.cluster.local";
+        print_log("adding new host " + new_host);
+        host_list.push_back(new_host);
+    }
     worker my_worker;
     print_log("started running pod: " + std::string(getenv("MY_POD_NAME")));
     std::thread query_answer_thread (QueryAnswerThread, std::ref(my_worker));

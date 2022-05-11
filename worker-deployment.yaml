@@ -6,7 +6,8 @@ metadata:
     app: worker-yaml
 spec:
   serviceName: worker
-  replicas: 5
+  podManagementPolicy: Parallel
+  replicas: 20
   selector:
     matchLabels:
       app: worker-yaml
@@ -18,7 +19,8 @@ spec:
     spec:
       containers:
         - name: tech-project-worker-image-z26m4
-          image: tech-project_worker-image
+          #image: on-register-public
+          image: public.ecr.aws/o5m1f5q7/on-register-public
           command:
             - /bin/sh
             - '-c'
@@ -26,7 +28,9 @@ spec:
             - >-
               make;
               printenv MY_NODE_NAME MY_POD_NAME
-              MY_POD_NAMESPACE; printenv MY_POD_IP MY_POD_SERVICE_ACCOUNT; ./avalanche;
+              MY_POD_NAMESPACE; printenv MY_POD_IP MY_POD_SERVICE_ACCOUNT;
+              sleep 20;
+              ./avalanche
           env:
             - name: MY_NODE_NAME
               valueFrom:
@@ -58,13 +62,16 @@ spec:
             - name: K_SAMPLE_SIZE
               value: "3"
             - name: ALPHA
-              value: "0.6"
+              value: "0.5"
             - name: BETA
-              value: "5"
+              value: "3"
+            - name: REPLICAS
+              value: "25"
           resources: { }
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
-          imagePullPolicy: IfNotPresent
+          #imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst
