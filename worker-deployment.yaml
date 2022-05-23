@@ -70,9 +70,9 @@ spec:
             - name : REPLICAS
               value: "2"
             - name: AWS_ACCESS_KEY
-              value: "AKIA5XYIV653EVSG4T6M"
+              value: ""
             - name: AWS_SECRET_KEY
-              value: "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"
+              value: ""
             - name: AWS_REGION
               value: "eu-central-1"
           resources: { }
