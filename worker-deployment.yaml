@@ -7,7 +7,7 @@ metadata:
 spec:
   serviceName: worker
   podManagementPolicy: Parallel
-  replicas: 125
+  replicas: 2
   selector:
     matchLabels:
       app: worker-yaml
@@ -16,6 +16,8 @@ spec:
       creationTimestamp: null
       labels:
         app: worker-yaml
+      annotations:
+        iam.amazonaws.com/role: arn:aws:iam::944374151030:role/AmazonEKSFargatePodExecutionRole
     spec:
       containers:
         - name: tech-project-worker-image-z26m4
@@ -29,6 +31,7 @@ spec:
               make;
               printenv MY_NODE_NAME MY_POD_NAME
               MY_POD_NAMESPACE; printenv MY_POD_IP MY_POD_SERVICE_ACCOUNT;
+              sleep 100000;
               python listener.py
           env:
             - name: MY_NODE_NAME
@@ -65,12 +68,13 @@ spec:
             - name: BETA
               value: "3"
             - name : REPLICAS
-              value: "125"
-#            - name: REPLICAS
-#              valueFrom:
-#                fieldRef:
-#                  apiVersion: v1
-#                  fieldPath: .spec.replicas
+              value: "2"
+            - name: AWS_ACCESS_KEY
+              value: "AKIA5XYIV653EVSG4T6M"
+            - name: AWS_SECRET_KEY
+              value: "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"
+            - name: AWS_REGION
+              value: "eu-central-1"
           resources: { }
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
