@@ -27,7 +27,9 @@ def main():
                       (j.status.pod_ip, j.metadata.namespace, j.metadata.name))
 
     print("starting the avalanche process")
-    os.system("./avalanche")
+    #change to numberofrounds + sleep + ....
+    os.system("timeout 20 ./avalanche")
+    print("finished running the avalanche process")
 
 if __name__ == '__main__':
     main()

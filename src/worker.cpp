@@ -32,6 +32,7 @@ worker::worker(){
 
 void worker::accept_round(int round_number){
     print_log("Accepted color: " + std::to_string((int) m_colors.at(round_number)) + " in round number:" + std::to_string(round_number));
+    print_csv( std::to_string(round_number) + "," + std::to_string((int) m_colors.at(round_number)));
 }
 
 void worker::queryAnswer() {
