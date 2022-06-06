@@ -31,14 +31,14 @@ AWS_S3_CREDS = {"aws_access_key_id": os.getenv("AWS_ACCESS_KEY"), # os.getenv("A
 #    print(e)
 #
 
-def get_files():
-    return ["o1", "o2"]
+def get_files(how_many):
+    return [f"workers_results/worker-envars-fieldref-statefulset-{i}_res.csv" for i in range(int(how_many))]
 
 
 def parse_data(results_dict, f):
     for line in f.readlines():
         round_number, accepted_color = line.strip().split(",")
-        results_dict[round_number][accepted_color] += 1
+        results_dict[str(int(round_number)+1)][accepted_color] += 1
 
 
 def plot(results_dict):
@@ -65,8 +65,9 @@ def build_dict(results_dict, number_of_rounds):
 
 def main():
     results_dict = {}
-    build_dict(results_dict, sys.argv[1])
-    files = get_files()
+    how_many = sys.argv[1]
+    build_dict(results_dict, how_many )
+    files = get_files(how_many)
     for output_file in files:
         with open(output_file) as f:
             parse_data(results_dict, f)

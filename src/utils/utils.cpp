@@ -9,7 +9,8 @@
 
 //#include <boost/log/trivial.hpp>
 // pod-name_alpha_beta_k_numberofrounds
-std::ofstream g_file ( std::string(getenv("MY_POD_NAME")) + "_" + std::string(getenv("ALPHA")) + "_" + std::string(getenv("BETA")) + "_" + std::string(getenv("K_SAMPLE_SIZE")) + "_" + std::string(getenv("NUMBER_OF_ROUNDS")));
+//std::ofstream g_file ( std::string(getenv("MY_POD_NAME")) + "_" + std::string(getenv("ALPHA")) + "_" + std::string(getenv("BETA")) + "_" + std::string(getenv("K_SAMPLE_SIZE")) + "_" + std::string(getenv("NUMBER_OF_ROUNDS")));
+std::ofstream g_file ( std::string(getenv("MY_POD_NAME")) + "_res");
 
 void print_log(std::string message){
     //BOOST_LOG_TRIVIAL(info) << message;

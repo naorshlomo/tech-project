@@ -28,7 +28,7 @@ def main():
 
     print("starting the avalanche process")
     #change to numberofrounds + sleep + ....
-    os.system("timeout 20 ./avalanche")
+    os.system("timeout 30 ./avalanche")
     print("finished running the avalanche process")
 
 if __name__ == '__main__':
