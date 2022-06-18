@@ -43,50 +43,51 @@ void worker::queryAnswer() {
     int master_socket = getQuerySocket(max_clients);
 
     while (1) {
-        FD_ZERO(&readfds);  
-        FD_SET(master_socket, &readfds);  
-        int max_sd = master_socket;  
-        for (int i = 0; i < max_clients; i++) {  
-            int sd = client_socket[i];  
+        FD_ZERO(&readfds);
+        FD_SET(master_socket, &readfds);
+
+        int max_sd = master_socket;
+        for (int i = 0; i < max_clients; i++) {
+            int sd = client_socket[i];
             if (sd > 0) {
                 FD_SET(sd, &readfds);
-	    }
-            if (sd > max_sd) {
-                max_sd = sd;  
-	    }
-        }  
-        int activity = select(max_sd + 1, &readfds, NULL, NULL , NULL);  
-        if ((activity < 0) && (errno!=EINTR)) {  
-            printf("select error");  
-        }  
-        if (FD_ISSET(master_socket, &readfds)) {  
-            int new_socket = accept(master_socket, NULL, NULL);
-            if (new_socket < 0) {  
-                perror("accept");  
-                exit(EXIT_FAILURE);  
             }
-            for (int i = 0; i < max_clients; i++)  {  
-                if (client_socket[i] == 0) {  
-                    client_socket[i] = new_socket;  
-                    break;  
-                }  
-            }  
-        }  
-        for (int i = 0; i < max_clients; i++) {  
-            int sd = client_socket[i];  
-            if (FD_ISSET(sd, &readfds)) {  
-		int valread = read(sd, buffer, 10);
-                if (valread == 0) {  
-                    close(sd);  
-                    client_socket[i] = 0;  
-                } else {  
+            if (sd > max_sd) {
+                max_sd = sd;
+            }
+        }
+        int activity = select(max_sd + 1, &readfds, NULL, NULL, NULL);
+        if ((activity < 0) && (errno != EINTR)) {
+            printf("select error");
+        }
+        if (FD_ISSET(master_socket, &readfds)) {
+            int new_socket = accept(master_socket, NULL, NULL);
+            if (new_socket < 0) {
+                perror("accept");
+                exit(EXIT_FAILURE);
+            }
+            for (int i = 0; i < max_clients; i++) {
+                if (client_socket[i] == 0) {
+                    client_socket[i] = new_socket;
+                    break;
+                }
+            }
+        }
+        for (int i = 0; i < max_clients; i++) {
+            int sd = client_socket[i];
+            if (FD_ISSET(sd, &readfds)) {
+                int valread = read(sd, buffer, 10);
+                if (valread == 0) {
+                    close(sd);
+                    client_socket[i] = 0;
+                } else {
                     buffer[valread] = '\0';
                     int requested_round = atoi(buffer);
                     std::string msg = std::to_string(m_colors.at(requested_round));
                     send(sd, msg.c_str(), strlen(msg.c_str()), 0);
-                }  
-            }  
-        }  
+                }
+            }
+        }
     }
     return;
 }

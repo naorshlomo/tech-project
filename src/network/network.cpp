@@ -114,6 +114,7 @@ color_t query(std::string addr, int round_number) {
     }
     send(sock, std::to_string(round_number).c_str(), strlen(std::to_string(round_number).c_str()), 0);
     read(sock, buffer, 1);
+    close(sock);
     return (color_t)(buffer[0] - '0');
 } 
 
