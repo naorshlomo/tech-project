@@ -85,6 +85,8 @@ void worker::queryAnswer() {
                     int requested_round = atoi(buffer);
                     std::string msg = std::to_string(m_colors.at(requested_round));
                     send(sd, msg.c_str(), strlen(msg.c_str()), 0);
+                    close(sd);
+                    client_socket[i] = 0;
                 }
             }
         }

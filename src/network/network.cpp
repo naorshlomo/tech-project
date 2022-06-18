@@ -25,6 +25,7 @@
 #define PORT 8080
 
 std::vector<std::string> host_list;
+std::vector<std::string> ip_list;
 
 std::string lookup_host (const char *host)
 {
@@ -78,16 +79,12 @@ void log_sample(std::vector<std::string> result) {
 
 std::vector<std::string> Sample(int k_sample_size) {
     std::vector<std::string> result;
-    std::vector<std::string>::iterator position = std::find(host_list.begin(), host_list.end(), std::string(getenv("MY_POD_IP")));
-    if (position != host_list.end()) {
-        host_list.erase(position);
-    }
     std::mt19937 engine;
     auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
     engine.seed((unsigned long)seed);
-    std::shuffle(host_list.begin(), host_list.end(), engine);
+    std::shuffle(ip_list.begin(), ip_list.end(), engine);
     for (int i = 0; i < k_sample_size; i++) {
-        result.push_back(host_list[i]);
+        result.push_back(ip_list[i]);
     }
     //log_sample(result);
     return result;
@@ -104,7 +101,7 @@ color_t query(std::string addr, int round_number) {
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(PORT);
     if (inet_pton(AF_INET, addr.c_str(), &serv_addr.sin_addr) <= 0) {
-        printf("\nInvalid address/ Address not supported \n");
+        printf("\nInvalid address/ Address not supported %s \n", addr.c_str());
         return (color_t)-1;
     }
  
@@ -120,11 +117,10 @@ color_t query(std::string addr, int round_number) {
 
 std::map<std::string, color_t> QueryAll(std::vector<std::string> sample_list, int round_number) {
     std::map<std::string, color_t>  result;
-    for (auto node: sample_list) {
-        auto addr = lookup_host(node.c_str());
+    for (auto addr: sample_list) {
 	    auto query_result = query(addr, round_number);
 	    if (query_result != -1) {
-                result[node] = query_result;
+                result[addr] = query_result;
 	    }
     }
     return result;

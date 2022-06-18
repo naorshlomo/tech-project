@@ -7,7 +7,7 @@ metadata:
 spec:
   serviceName: worker
   podManagementPolicy: Parallel
-  replicas: 5
+  replicas: 75
   selector:
     matchLabels:
       app: worker-yaml
@@ -32,7 +32,7 @@ spec:
               printenv MY_NODE_NAME MY_POD_NAME
               MY_POD_NAMESPACE; printenv MY_POD_IP MY_POD_SERVICE_ACCOUNT;
               python listener.py;
-              sleep 300;
+              sleep 1000;
           env:
             - name: MY_NODE_NAME
               valueFrom:
@@ -60,15 +60,15 @@ spec:
                   apiVersion: v1
                   fieldPath: spec.serviceAccountName
             - name: NUMBER_OF_ROUNDS
-              value: "5"
+              value: "20"
             - name: K_SAMPLE_SIZE
-              value: "2"
+              value: "10"
             - name: ALPHA
-              value: "0.6"
+              value: "0.8"
             - name: BETA
-              value: "3"
+              value: "11"
             - name : REPLICAS
-              value: "5"
+              value: "75"
             - name: AWS_ACCESS_KEY
               value: ""
             - name: AWS_SECRET_KEY

@@ -41,7 +41,7 @@ def parse_data(results_dict, f):
         results_dict[str(int(round_number)+1)][accepted_color] += 1
 
 
-def plot(results_dict):
+def plot(results_dict, how_many):
     #import pdb;pdb.set_trace()
 
     df = pd.DataFrame.from_dict(results_dict, orient="index")
@@ -51,6 +51,7 @@ def plot(results_dict):
     ax.set_ylabel("number of acceptors")
     plt.legend(loc='upper left')
     ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+    ax.set_ylim((0, how_many + 10))
     ax.set_xticklabels(ax.get_xticks(), rotation=0)
 
     plt.savefig('data.png')
@@ -66,13 +67,14 @@ def build_dict(results_dict, number_of_rounds):
 def main():
     results_dict = {}
     how_many = sys.argv[1]
-    build_dict(results_dict, how_many )
+    number_of_rounds = sys.argv[2]
+    build_dict(results_dict, number_of_rounds )
     files = get_files(how_many)
     for output_file in files:
         with open(output_file) as f:
             parse_data(results_dict, f)
     print(results_dict)
-    plot(results_dict)
+    plot(results_dict, int(how_many))
 
 
 if __name__ == '__main__':

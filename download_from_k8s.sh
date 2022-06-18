@@ -1,8 +1,16 @@
 #!/bin/bash
-HOW_MANY=5
+rm -rf workers_results/
+mkdir workers_results
+HOW_MANY=75
 for (( VARIABLE=0; VARIABLE<$HOW_MANY; VARIABLE++ ))
 do
   echo $VARIABLE
-    kubectl cp default/worker-envars-fieldref-statefulset-${VARIABLE}:worker-envars-fieldref-statefulset-${VARIABLE}_res workers_results/worker-envars-fieldref-statefulset-${VARIABLE}_res.csv
+    kubectl cp default/worker-envars-fieldref-statefulset-${VARIABLE}:worker-envars-fieldref-statefulset-${VARIABLE}_res workers_results/worker-envars-fieldref-statefulset-${VARIABLE}_res.csv &
 done
-python3 parser.py $HOW_MANY
+x=0
+while [ $x -le $HOW_MANY ]
+do
+  # shellcheck disable=SC2012
+  x=$(ls -l workers_results/ | wc -l)
+done
+python3 parser.py $HOW_MANY 20

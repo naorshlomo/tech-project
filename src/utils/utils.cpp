@@ -24,7 +24,7 @@ void print_csv(std::string message){
     g_file << message << std::endl;
 }
 
-int CountSampleResults(std::map<std::string, color_t > sample_results, color_t color){
+int CountSampleResults(std::map<std::string, color_t > &sample_results, color_t color){
     int count = 0;
     for (auto sample: sample_results){
         if (sample.second == color){
