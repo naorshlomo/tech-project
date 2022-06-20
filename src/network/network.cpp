@@ -26,6 +26,7 @@
 
 std::vector<std::string> host_list;
 std::vector<std::string> ip_list;
+std::map<std::string, int> socket_list;
 
 std::string lookup_host (const char *host)
 {
@@ -91,31 +92,15 @@ std::vector<std::string> Sample(int k_sample_size) {
 }
 
 color_t query(std::string addr, int round_number) {
-    int sock = 0;
-    struct sockaddr_in serv_addr;
+    int sock = socket_list.at(addr);
     char buffer[1] = {0};
-    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        printf("\n Socket creation error \n");
-        return (color_t)-1;
-    }
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(PORT);
-    if (inet_pton(AF_INET, addr.c_str(), &serv_addr.sin_addr) <= 0) {
-        printf("\nInvalid address/ Address not supported %s \n", addr.c_str());
-        return (color_t)-1;
-    }
- 
-    if (connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
-//        printf("\nConnection Failed \n");
-        return (color_t)-1;
-    }
     send(sock, std::to_string(round_number).c_str(), strlen(std::to_string(round_number).c_str()), 0);
     read(sock, buffer, 1);
-    close(sock);
+//    close(sock);
     return (color_t)(buffer[0] - '0');
 } 
 
-std::map<std::string, color_t> QueryAll(std::vector<std::string> sample_list, int round_number) {
+std::map<std::string, color_t> QueryAll(std::vector<std::string> &sample_list, int round_number) {
     std::map<std::string, color_t>  result;
     for (auto addr: sample_list) {
 	    auto query_result = query(addr, round_number);
@@ -158,9 +143,31 @@ int getQuerySocket(int max_clients) {
         perror("bind failed");
         exit(EXIT_FAILURE);
     }
-    if (listen(master_socket, 300) < 0) {
+    if (listen(master_socket, max_clients) < 0) {
         perror("listen");
         exit(EXIT_FAILURE);
     }
     return master_socket;
+}
+
+
+int get_socket(std::string addr){
+    int sock = 0;
+    struct sockaddr_in serv_addr;
+    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+        printf("\n Socket creation error \n");
+        return -1;
+    }
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(PORT);
+    if (inet_pton(AF_INET, addr.c_str(), &serv_addr.sin_addr) <= 0) {
+        printf("\nInvalid address/ Address not supported %s \n", addr.c_str());
+        return -1;
+    }
+
+    if (connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
+//        printf("\nConnection Failed \n");
+        return -1;
+    }
+    return sock;
 }

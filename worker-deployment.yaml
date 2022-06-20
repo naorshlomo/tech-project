@@ -60,7 +60,7 @@ spec:
                   apiVersion: v1
                   fieldPath: spec.serviceAccountName
             - name: NUMBER_OF_ROUNDS
-              value: "20"
+              value: "100"
             - name: K_SAMPLE_SIZE
               value: "10"
             - name: ALPHA

@@ -1,6 +1,7 @@
 #!/bin/bash
 rm -rf workers_results/
 mkdir workers_results
+NUMBER_OF_ROUNDS=100
 HOW_MANY=75
 for (( VARIABLE=0; VARIABLE<$HOW_MANY; VARIABLE++ ))
 do
@@ -13,4 +14,4 @@ do
   # shellcheck disable=SC2012
   x=$(ls -l workers_results/ | wc -l)
 done
-python3 parser.py $HOW_MANY 20
+python3 parser.py $HOW_MANY $NUMBER_OF_ROUNDS

@@ -37,8 +37,8 @@ void worker::accept_round(int round_number){
 
 void worker::queryAnswer() {
     char buffer[10] = {0};
-    int max_clients = 300;
-    int client_socket[300] = {0};
+    int max_clients = 150;
+    int client_socket[150] = {0};
     fd_set readfds;
     int master_socket = getQuerySocket(max_clients);
 
@@ -78,15 +78,16 @@ void worker::queryAnswer() {
             if (FD_ISSET(sd, &readfds)) {
                 int valread = read(sd, buffer, 10);
                 if (valread == 0) {
-                    close(sd);
-                    client_socket[i] = 0;
+                    continue;
+//                    close(sd);
+//                    client_socket[i] = 0;
                 } else {
                     buffer[valread] = '\0';
                     int requested_round = atoi(buffer);
                     std::string msg = std::to_string(m_colors.at(requested_round));
                     send(sd, msg.c_str(), strlen(msg.c_str()), 0);
-                    close(sd);
-                    client_socket[i] = 0;
+//                    close(sd);
+//                    client_socket[i] = 0;
                 }
             }
         }
@@ -96,24 +97,21 @@ void worker::queryAnswer() {
 
 
 
-void worker::run_snowflake_loop(int round_number){
-    int k_sample_size = std::stoi(std::string(getenv("K_SAMPLE_SIZE")));
-    double alpha = std::stod(std::string(getenv("ALPHA")));
-    int beta = std::stoi(std::string(getenv("BETA")));
+void run_snowflake_loop(worker *our_worker, int round_number){
     while (true){
-        auto k_sample_list = Sample(k_sample_size);
+        auto k_sample_list = Sample(K_SAMPLE_SIZE);
         auto sample_results = QueryAll(k_sample_list, round_number);
         for (auto color : colors) {
             int count = CountSampleResults(sample_results, color);
-            if (count >=  alpha * k_sample_size){
-                if (color != m_colors.at(round_number)){
-                    m_colors[round_number] = color;
-                    m_count[round_number] = 0;
+            if (count >=  ALPHA * K_SAMPLE_SIZE){
+                if (color != our_worker->m_colors.at(round_number)){
+                    our_worker->m_colors[round_number] = color;
+                    our_worker->m_count[round_number] = 0;
                 }
                 else {
-                    m_count[round_number]++;
-                    if(m_count[round_number] > beta){
-                        accept_round(round_number);
+                    our_worker->m_count[round_number]++;
+                    if(our_worker->m_count[round_number] > BETA){
+//                        our_worker->accept_round(round_number);
                         return;
                     }
                 }
@@ -124,9 +122,28 @@ void worker::run_snowflake_loop(int round_number){
 
 
 void worker::run_snowflake(){
+    std::vector<std::thread> snowflake_threads;
+    auto start = std::chrono::steady_clock::now();
     int number_of_rounds = std::stoi(std::string(getenv("NUMBER_OF_ROUNDS")));
-    for (int i = 0; i < number_of_rounds ; ++i) {
-        run_snowflake_loop(i);
+    for (int j = 0; j < number_of_rounds/10 ; j+=10) {
+        if (j==1){
+            start = std::chrono::steady_clock::now();
+        }
+        for (int i = 0; i < 10 ; ++i) {
+            snowflake_threads.push_back(std::thread (run_snowflake_loop, this, j*10+i));
+        }
+        for (auto & loop_thread: snowflake_threads) {
+            loop_thread.join();
+        }
+        snowflake_threads.clear();
     }
+    auto end = std::chrono::steady_clock::now();
+    for (int j = 0; j < number_of_rounds ; j++) {
+        accept_round(j);
+    }
+
+    std::cout << "Elapsed time in milliseconds: "
+         << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()
+         << " ms" << std::endl;
 }
 

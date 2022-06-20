@@ -12,10 +12,12 @@
 
 extern std::vector<std::string> host_list;
 extern std::vector<std::string> ip_list;
+extern std::map<std::string, int> socket_list;
 
 int getQuerySocket(int max_clients);
 std::vector<std::string> Sample(int k_sample_size);
-std::map<std::string, color_t> QueryAll(std::vector<std::string> sample_list, int round_number);
+std::map<std::string, color_t> QueryAll(std::vector<std::string> &sample_list, int round_number);
 std::string lookup_host (const char *host);
+int get_socket (std::string addr);
 
 #endif //TECH_PROJECT_NETWORK_H
