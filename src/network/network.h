@@ -10,6 +10,8 @@
 #include <vector>
 #include <string>
 
+extern int BATCH_SIZE;
+
 extern std::vector<std::string> host_list;
 extern std::vector<std::string> ip_list;
 extern std::map<std::string, int> socket_list;

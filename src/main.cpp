@@ -30,8 +30,11 @@ int main() {
         auto addr = lookup_host(new_host.c_str());
         if (addr !=std::string(getenv("MY_POD_IP")) ) {
             ip_list.push_back(addr);
-            socket_list[addr] = get_socket(addr);
-            print_log("added " + addr);
+            for(int j = 0; j < BATCH_SIZE; j++) {
+                auto new_addr = addr + std::to_string(j);
+                socket_list[new_addr] = get_socket(addr);
+                print_log("added " + addr);
+            }
         } else{
             print_log("removed my ip " + addr);
         }

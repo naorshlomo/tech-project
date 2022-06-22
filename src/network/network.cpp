@@ -24,6 +24,7 @@
 #include <arpa/inet.h>
 #define PORT 8080
 
+int BATCH_SIZE = 5;
 std::vector<std::string> host_list;
 std::vector<std::string> ip_list;
 std::map<std::string, int> socket_list;
@@ -92,7 +93,8 @@ std::vector<std::string> Sample(int k_sample_size) {
 }
 
 color_t query(std::string addr, int round_number) {
-    int sock = socket_list.at(addr);
+    auto new_addr = addr + std::to_string(round_number % BATCH_SIZE);
+    int sock = socket_list.at(new_addr);
     char buffer[1] = {0};
     send(sock, std::to_string(round_number).c_str(), strlen(std::to_string(round_number).c_str()), 0);
     read(sock, buffer, 1);

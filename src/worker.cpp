@@ -19,6 +19,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #define PORT 8080
+#define NUMBER_OF_SOCKETS 500
 
 worker::worker(){
     int number_of_rounds = std::stoi(std::string(getenv("NUMBER_OF_ROUNDS")));
@@ -37,8 +38,8 @@ void worker::accept_round(int round_number){
 
 void worker::queryAnswer() {
     char buffer[10] = {0};
-    int max_clients = 150;
-    int client_socket[150] = {0};
+    int max_clients = NUMBER_OF_SOCKETS;
+    int client_socket[NUMBER_OF_SOCKETS] = {0};
     fd_set readfds;
     int master_socket = getQuerySocket(max_clients);
 
@@ -125,12 +126,12 @@ void worker::run_snowflake(){
     std::vector<std::thread> snowflake_threads;
     auto start = std::chrono::steady_clock::now();
     int number_of_rounds = std::stoi(std::string(getenv("NUMBER_OF_ROUNDS")));
-    for (int j = 0; j < number_of_rounds/10 ; j+=10) {
+    for (int j = 0; j < number_of_rounds/BATCH_SIZE ; j+=BATCH_SIZE) {
         if (j==1){
             start = std::chrono::steady_clock::now();
         }
-        for (int i = 0; i < 10 ; ++i) {
-            snowflake_threads.push_back(std::thread (run_snowflake_loop, this, j*10+i));
+        for (int i = 0; i < BATCH_SIZE ; ++i) {
+            snowflake_threads.push_back(std::thread (run_snowflake_loop, this, j*BATCH_SIZE+i));
         }
         for (auto & loop_thread: snowflake_threads) {
             loop_thread.join();
