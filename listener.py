@@ -35,7 +35,7 @@ def main():
     print("starting the avalanche process")
     sys.stdout.flush()
     #change to numberofrounds + sleep + ....
-    os.system("timeout 500 ./avalanche")
+    os.system("timeout 10000 ./avalanche")
     sys.stdout.flush()
     print("finished running the avalanche process")
     sys.stdout.flush()

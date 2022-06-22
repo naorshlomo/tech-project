@@ -79,16 +79,15 @@ void worker::queryAnswer() {
             if (FD_ISSET(sd, &readfds)) {
                 int valread = read(sd, buffer, 10);
                 if (valread == 0) {
-                    continue;
-//                    close(sd);
-//                    client_socket[i] = 0;
+                    close(sd);
+                    client_socket[i] = 0;
                 } else {
                     buffer[valread] = '\0';
                     int requested_round = atoi(buffer);
                     std::string msg = std::to_string(m_colors.at(requested_round));
                     send(sd, msg.c_str(), strlen(msg.c_str()), 0);
-//                    close(sd);
-//                    client_socket[i] = 0;
+                    close(sd);
+                    client_socket[i] = 0;
                 }
             }
         }
@@ -98,9 +97,9 @@ void worker::queryAnswer() {
 
 
 
-void run_snowflake_loop(worker *our_worker, int round_number){
+void run_snowflake_loop(worker *our_worker, int round_number, std::vector<std::string> local_ip_list){
     while (true){
-        auto k_sample_list = Sample(K_SAMPLE_SIZE);
+        auto k_sample_list = Sample(K_SAMPLE_SIZE, local_ip_list);
         auto sample_results = QueryAll(k_sample_list, round_number);
         for (auto color : colors) {
             int count = CountSampleResults(sample_results, color);
@@ -126,12 +125,12 @@ void worker::run_snowflake(){
     std::vector<std::thread> snowflake_threads;
     auto start = std::chrono::steady_clock::now();
     int number_of_rounds = std::stoi(std::string(getenv("NUMBER_OF_ROUNDS")));
-    for (int j = 0; j < number_of_rounds/BATCH_SIZE ; j+=BATCH_SIZE) {
+    for (int j = 0; j < number_of_rounds/BATCH_SIZE ; j++) {
         if (j==1){
             start = std::chrono::steady_clock::now();
         }
         for (int i = 0; i < BATCH_SIZE ; ++i) {
-            snowflake_threads.push_back(std::thread (run_snowflake_loop, this, j*BATCH_SIZE+i));
+            snowflake_threads.push_back( std::thread(run_snowflake_loop, this, j*BATCH_SIZE+i, ip_list));
         }
         for (auto & loop_thread: snowflake_threads) {
             loop_thread.join();

@@ -7,6 +7,7 @@
 
 #include "src/utils/utils.h"
 #include <atomic>
+#include <vector>
 
 class worker {
 public:
@@ -19,7 +20,7 @@ public:
     void queryAnswer();
 };
 
-void run_snowflake_loop(worker *our_worker, int round_number);
+void run_snowflake_loop(worker *our_worker, int round_number, std::vector<std::string> local_ip_list);
 extern int K_SAMPLE_SIZE;
 extern double ALPHA;
 extern int BETA;

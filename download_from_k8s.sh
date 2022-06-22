@@ -6,7 +6,8 @@ HOW_MANY=75
 for (( VARIABLE=0; VARIABLE<$HOW_MANY; VARIABLE++ ))
 do
   echo $VARIABLE
-    kubectl cp default/worker-envars-fieldref-statefulset-${VARIABLE}:worker-envars-fieldref-statefulset-${VARIABLE}_res workers_results/worker-envars-fieldref-statefulset-${VARIABLE}_res.csv &
+    kubectl cp default/worker-envars-fieldref-statefulset-${VARIABLE}:worker-envars-fieldref-statefulset-${VARIABLE}_res workers_results/worker-envars-fieldref-statefulset-${VARIABLE}_res.csv
+#    sleep 0.8
 done
 x=0
 while [ $x -le $HOW_MANY ]
