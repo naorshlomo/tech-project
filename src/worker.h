@@ -17,7 +17,7 @@ public:
     worker();
     void accept_round(int round_number);
     void run_snowflake();
-    void queryAnswer();
+    void queryAnswer(int local_port);
 };
 
 void run_snowflake_loop(worker *our_worker, int round_number, std::vector<std::string> local_ip_list);

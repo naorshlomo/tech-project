@@ -23,6 +23,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #define PORT 8080
+#define PORT_2 8081
 
 int BATCH_SIZE = 10;
 std::vector<std::string> host_list;
@@ -95,7 +96,9 @@ std::vector<std::string> Sample(int k_sample_size, std::vector<std::string> & lo
 color_t query(std::string addr, int round_number) {
 //    auto new_addr = addr + std::to_string(round_number % BATCH_SIZE);
 //    int sock = socket_list.at(new_addr);
-    int sock = get_socket(addr);
+    srand(time(0));
+    int local_port = rand() % 2 == 0 ? PORT : PORT_2;
+    int sock = get_socket(addr, local_port);
     char buffer[1] = {0};
     send(sock, std::to_string(round_number).c_str(), strlen(std::to_string(round_number).c_str()), 0);
     read(sock, buffer, 1);
@@ -114,7 +117,7 @@ std::map<std::string, color_t> QueryAll(std::vector<std::string> &sample_list, i
     return result;
 }
 
-int getQuerySocket(int max_clients) {
+int getQuerySocket(int max_clients, int local_port) {
     struct sockaddr_in address;
     int opt = 1;
     int master_socket;
@@ -137,7 +140,7 @@ int getQuerySocket(int max_clients) {
     }
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons(PORT);
+    address.sin_port = htons(local_port);
  
     // Forcefully attaching socket to the port 8080
     if (bind(master_socket, (struct sockaddr*)&address,
@@ -154,7 +157,7 @@ int getQuerySocket(int max_clients) {
 }
 
 
-int get_socket(std::string addr){
+int get_socket(std::string addr, int local_port){
     int sock = 0;
     struct sockaddr_in serv_addr;
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -162,7 +165,7 @@ int get_socket(std::string addr){
         return -1;
     }
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(PORT);
+    serv_addr.sin_port = htons(local_port);
     if (inet_pton(AF_INET, addr.c_str(), &serv_addr.sin_addr) <= 0) {
         printf("\nInvalid address/ Address not supported %s \n", addr.c_str());
         return -1;

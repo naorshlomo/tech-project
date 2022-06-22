@@ -60,13 +60,13 @@ spec:
                   apiVersion: v1
                   fieldPath: spec.serviceAccountName
             - name: NUMBER_OF_ROUNDS
-              value: "100"
+              value: "60"
             - name: K_SAMPLE_SIZE
               value: "10"
             - name: ALPHA
-              value: "0.8"
+              value: "0.7"
             - name: BETA
-              value: "11"
+              value: "8"
             - name : REPLICAS
               value: "75"
             - name: AWS_ACCESS_KEY

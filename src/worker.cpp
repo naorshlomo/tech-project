@@ -36,12 +36,12 @@ void worker::accept_round(int round_number){
     print_csv( std::to_string(round_number) + "," + std::to_string((int) m_colors.at(round_number)));
 }
 
-void worker::queryAnswer() {
+void worker::queryAnswer(int local_port) {
     char buffer[10] = {0};
     int max_clients = NUMBER_OF_SOCKETS;
     int client_socket[NUMBER_OF_SOCKETS] = {0};
     fd_set readfds;
-    int master_socket = getQuerySocket(max_clients);
+    int master_socket = getQuerySocket(max_clients, local_port);
 
     while (1) {
         FD_ZERO(&readfds);
