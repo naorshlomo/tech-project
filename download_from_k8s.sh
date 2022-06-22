@@ -1,7 +1,7 @@
 #!/bin/bash
 rm -rf workers_results/
 mkdir workers_results
-NUMBER_OF_ROUNDS=100
+NUMBER_OF_ROUNDS=60
 HOW_MANY=75
 for (( VARIABLE=0; VARIABLE<$HOW_MANY; VARIABLE++ ))
 do

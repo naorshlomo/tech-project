@@ -20,6 +20,11 @@ services:
       dockerfile: Dockerfile-worker
     env_file:
       - src/service-variables.env
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 26677
+        hard: 46677
 #  worker-image-1:
 #    tty: true
 #    stdin_open: true

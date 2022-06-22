@@ -19,7 +19,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #define PORT 8080
-#define NUMBER_OF_SOCKETS 500
+#define NUMBER_OF_SOCKETS 1000
 
 worker::worker(){
     int number_of_rounds = std::stoi(std::string(getenv("NUMBER_OF_ROUNDS")));
@@ -112,6 +112,7 @@ void run_snowflake_loop(worker *our_worker, int round_number, std::vector<std::s
                     our_worker->m_count[round_number]++;
                     if(our_worker->m_count[round_number] > BETA){
 //                        our_worker->accept_round(round_number);
+//                        print_log("Accepted color: " + std::to_string((int) our_worker->m_colors.at(round_number)) + " in round number:" + std::to_string(round_number));
                         return;
                     }
                 }
