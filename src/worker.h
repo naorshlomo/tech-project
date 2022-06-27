@@ -13,6 +13,7 @@ class worker {
 public:
     std::map<int, int> m_count;
     std::map<int, color_t> m_colors;
+    std::atomic<int> m_wasted_rounds;
 
     worker();
     void accept_round(int round_number);
@@ -24,4 +25,5 @@ void run_snowflake_loop(worker *our_worker, int round_number, std::vector<std::s
 extern int K_SAMPLE_SIZE;
 extern double ALPHA;
 extern int BETA;
+extern int REPLICAS;
 #endif //TECH_PROJECT_WORKER_H

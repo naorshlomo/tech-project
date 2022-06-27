@@ -29,6 +29,7 @@ worker::worker(){
         std::srand(seed);
         m_colors[i] = (color_t) (rand() % 2);
     }
+    m_wasted_rounds = 0;
 }
 
 void worker::accept_round(int round_number){
@@ -79,15 +80,16 @@ void worker::queryAnswer(int local_port) {
             if (FD_ISSET(sd, &readfds)) {
                 int valread = read(sd, buffer, 10);
                 if (valread == 0) {
-                    close(sd);
-                    client_socket[i] = 0;
+                    //close(sd);
+                    //client_socket[i] = 0;
+                    continue;
                 } else {
                     buffer[valread] = '\0';
                     int requested_round = atoi(buffer);
                     std::string msg = std::to_string(m_colors.at(requested_round));
                     send(sd, msg.c_str(), strlen(msg.c_str()), 0);
-                    close(sd);
-                    client_socket[i] = 0;
+                    //close(sd);
+                    //client_socket[i] = 0;
                 }
             }
         }
@@ -98,6 +100,8 @@ void worker::queryAnswer(int local_port) {
 
 
 void run_snowflake_loop(worker *our_worker, int round_number, std::vector<std::string> local_ip_list){
+    //auto start_batch = std::chrono::steady_clock::now();
+
     while (true){
         auto k_sample_list = Sample(K_SAMPLE_SIZE, local_ip_list);
         auto sample_results = QueryAll(k_sample_list, round_number);
@@ -105,12 +109,17 @@ void run_snowflake_loop(worker *our_worker, int round_number, std::vector<std::s
             int count = CountSampleResults(sample_results, color);
             if (count >=  ALPHA * K_SAMPLE_SIZE){
                 if (color != our_worker->m_colors.at(round_number)){
+                    our_worker->m_wasted_rounds += our_worker->m_count[round_number] + 1;
                     our_worker->m_colors[round_number] = color;
                     our_worker->m_count[round_number] = 0;
                 }
                 else {
                     our_worker->m_count[round_number]++;
                     if(our_worker->m_count[round_number] > BETA){
+//                        auto end_batch = std::chrono::steady_clock::now();
+//                        std::cout << "Elapsed time - round: " << std::to_string(round_number) << " "
+//                                  << std::chrono::duration_cast<std::chrono::milliseconds>(end_batch - start_batch).count()
+//                                  << " ms" << std::endl;
 //                        our_worker->accept_round(round_number);
 //                        print_log("Accepted color: " + std::to_string((int) our_worker->m_colors.at(round_number)) + " in round number:" + std::to_string(round_number));
                         return;
@@ -126,25 +135,38 @@ void worker::run_snowflake(){
     std::vector<std::thread> snowflake_threads;
     auto start = std::chrono::steady_clock::now();
     int number_of_rounds = std::stoi(std::string(getenv("NUMBER_OF_ROUNDS")));
+    int acc = 0;
     for (int j = 0; j < number_of_rounds/BATCH_SIZE ; j++) {
+        auto start_batch = std::chrono::steady_clock::now();
+
         if (j==1){
             start = std::chrono::steady_clock::now();
         }
         for (int i = 0; i < BATCH_SIZE ; ++i) {
-            snowflake_threads.push_back( std::thread(run_snowflake_loop, this, j*BATCH_SIZE+i, ip_list));
+            snowflake_threads.emplace_back(run_snowflake_loop, this, j*BATCH_SIZE+i, ip_list);
         }
         for (auto & loop_thread: snowflake_threads) {
             loop_thread.join();
         }
+
+        auto end_batch = std::chrono::steady_clock::now();
+        std::cout << "Elapsed time - batch: "
+                  << std::chrono::duration_cast<std::chrono::milliseconds>(end_batch - start_batch).count()
+                  << " ms" << std::endl;
+        std::cout << "Wasted round is: " << std::to_string(m_wasted_rounds) << std::endl;
+        acc += m_wasted_rounds;
+        m_wasted_rounds = 0;
         snowflake_threads.clear();
     }
     auto end = std::chrono::steady_clock::now();
+    std::cout << "Elapsed time in milliseconds: "
+              << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()
+              << " ms" << std::endl;
+    std::cout << "Wasted round is: " << std::to_string(acc) << std::endl;
+
     for (int j = 0; j < number_of_rounds ; j++) {
         accept_round(j);
     }
 
-    std::cout << "Elapsed time in milliseconds: "
-         << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()
-         << " ms" << std::endl;
 }
 

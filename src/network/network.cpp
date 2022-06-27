@@ -3,6 +3,7 @@
 //
 
 #include "network.h"
+#include "../worker.h"
 #include <algorithm>
 #include <random>
 #include <chrono>
@@ -25,7 +26,7 @@
 #define PORT 8080
 #define PORT_2 8081
 
-int BATCH_SIZE = 10;
+int BATCH_SIZE = 5;
 std::vector<std::string> host_list;
 std::vector<std::string> ip_list;
 std::map<std::string, int> socket_list;
@@ -82,27 +83,34 @@ void log_sample(std::vector<std::string> result) {
 
 std::vector<std::string> Sample(int k_sample_size, std::vector<std::string> & local_ip_list) {
     std::vector<std::string> result;
-    std::mt19937 engine;
-    auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-    engine.seed((unsigned long)seed);
-    std::shuffle(local_ip_list.begin(), local_ip_list.end(), engine);
+    std::random_device rd;
+    std::mt19937 mt(rd());
     for (int i = 0; i < k_sample_size; i++) {
-        result.push_back(local_ip_list[i]);
+        std::uniform_real_distribution<double> dist(0, REPLICAS-2);
+        int dist_num = (int)dist(mt);
+        result.push_back(local_ip_list[dist_num]);
     }
+//    std::mt19937 engine;
+//    auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+//    engine.seed((unsigned long)seed);
+//    std::shuffle(local_ip_list.begin(), local_ip_list.end(), engine);
+//    for (int i = 0; i < k_sample_size; i++) {
+//        result.push_back(local_ip_list[i]);
+//    }
     //log_sample(result);
     return result;
 }
 
 color_t query(std::string addr, int round_number) {
-//    auto new_addr = addr + std::to_string(round_number % BATCH_SIZE);
-//    int sock = socket_list.at(new_addr);
-    srand(time(0));
-    int local_port = rand() % 2 == 0 ? PORT : PORT_2;
-    int sock = get_socket(addr, local_port);
+    auto new_addr = addr + std::to_string(round_number % BATCH_SIZE);
+    int sock = socket_list.at(new_addr);
+    //srand(time(0));
+    //int local_port = rand() % 2 == 0 ? PORT : PORT_2;
+    //int sock = get_socket(addr, local_port);
     char buffer[1] = {0};
     send(sock, std::to_string(round_number).c_str(), strlen(std::to_string(round_number).c_str()), 0);
     read(sock, buffer, 1);
-    close(sock);
+    //close(sock);
     return (color_t)(buffer[0] - '0');
 } 
 

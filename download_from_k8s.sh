@@ -2,7 +2,7 @@
 rm -rf workers_results/
 mkdir workers_results
 NUMBER_OF_ROUNDS=60
-HOW_MANY=75
+HOW_MANY=100
 for (( VARIABLE=0; VARIABLE<$HOW_MANY; VARIABLE++ ))
 do
   echo $VARIABLE
