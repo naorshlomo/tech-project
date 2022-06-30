@@ -26,7 +26,7 @@ void QueryAnswerThread(worker& a, int local_port) {
 int main() {
     worker my_worker;
     std::thread query_answer_thread (QueryAnswerThread, std::ref(my_worker), PORT);
-//    std::thread query_answer_thread_2 (QueryAnswerThread, std::ref(my_worker), PORT_2);
+    std::thread query_answer_thread_2 (QueryAnswerThread, std::ref(my_worker), PORT_2);
     std::this_thread::sleep_for(std::chrono::milliseconds(20000));
 
     for (int i = 0; i < std::stoi(std::string(getenv("REPLICAS"))) ; ++i) {
@@ -36,17 +36,18 @@ int main() {
         auto addr = lookup_host(new_host.c_str());
         if (addr !=std::string(getenv("MY_POD_IP")) ) {
             ip_list.push_back(addr);
-            for(int j = 0; j < BATCH_SIZE; j++) {
-//                std::random_device rd;
-//                std::mt19937 mt(rd());
-//                std::uniform_real_distribution<double> dist(-10.0, 10.0);
-//                int local_port = dist(mt) >= 0 ? PORT : PORT_2;
-                auto new_addr = addr + std::to_string(j);
-//                socket_list[new_addr] = get_socket(addr, local_port);
-                socket_list[new_addr] = get_socket(addr, PORT);
-                print_log("adding new host " + new_host + " with ip " + addr + "and port " + std::to_string(PORT));
-                print_log("added " + addr);
-            }
+//            for(int j = 0; j < BATCH_SIZE; j++) {
+            std::random_device rd;
+            std::mt19937 mt(rd());
+            std::uniform_real_distribution<double> dist(-10.0, 10.0);
+            int local_port = dist(mt) >= 0 ? PORT : PORT_2;
+//            auto new_addr = addr + std::to_string(j);
+            auto new_addr = addr + std::to_string(0);
+            socket_list[new_addr] = get_socket(addr, local_port);
+//                socket_list[new_addr] = get_socket(addr, PORT);
+            print_log("adding new host " + new_host + " with ip " + addr + "and port " + std::to_string(PORT));
+            print_log("added " + addr);
+//            }
         } else{
             print_log("removed my ip " + addr);
         }
@@ -58,6 +59,6 @@ int main() {
 
     my_worker.run_snowflake();
     query_answer_thread.join();
-//    query_answer_thread_2.join();
+    query_answer_thread_2.join();
     return 0;
 }

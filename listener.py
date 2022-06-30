@@ -21,7 +21,7 @@ def main():
 
     ret = v1.list_pod_for_all_namespaces(watch=False )
     counter =0
-    while counter != int(replicas) + 20:
+    while counter != int(replicas) + 4:
         ret = v1.list_pod_for_all_namespaces(watch=False)
         counter = 0
         for j in ret.items:
