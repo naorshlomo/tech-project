@@ -29,13 +29,14 @@ def main():
                 counter+=1
                 # print("%s\t%s\t%s" %
                 #       (j.status.pod_ip, j.metadata.namespace, j.metadata.name))
-        time.sleep(2)
+        time.sleep(0.5)
         
 
     print("starting the avalanche process")
     sys.stdout.flush()
     #change to numberofrounds + sleep + ....
-    os.system("timeout 10000 ./avalanche")
+    # os.system("timeout 10000 ./avalanche")
+    os.system("./avalanche &")
     sys.stdout.flush()
     print("finished running the avalanche process")
     sys.stdout.flush()

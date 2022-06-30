@@ -2,6 +2,7 @@ import os
 import sys
 #import boto3
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.ticker import MaxNLocator
 import pandas as pd
 
@@ -35,8 +36,10 @@ def get_files(how_many):
     return [f"workers_results/worker-envars-fieldref-statefulset-{i}_res.csv" for i in range(int(how_many))]
 
 
-def parse_data(results_dict, f):
-    for line in f.readlines():
+def parse_data(results_dict, f, times):
+    first_row = f.readline()
+    times.append(int(first_row))
+    for line in f.readlines()[1:]:
         round_number, accepted_color = line.strip().split(",")
         results_dict[str(int(round_number)+1)][accepted_color] += 1
 
@@ -70,11 +73,14 @@ def main():
     number_of_rounds = sys.argv[2]
     build_dict(results_dict, number_of_rounds )
     files = get_files(how_many)
+    times = []
     for output_file in files:
         with open(output_file) as f:
-            parse_data(results_dict, f)
+            parse_data(results_dict, f, times)
     print(results_dict)
-    plot(results_dict, int(how_many))
+    # plot(results_dict, int(how_many))
+    df = pd.DataFrame(times)
+    print(f"the avg is :{df.apply(np.average)}")
 
 
 if __name__ == '__main__':

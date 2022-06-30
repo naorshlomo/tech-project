@@ -11,6 +11,12 @@
 
 #define PORT 8080
 #define PORT_2 8081
+#define PORT_3 8083
+#define PORT_4 8084
+#define PORT_5 8085
+#define PORT_6 8086
+#define PORT_7 8087
+#define PORT_8 8088
 
 int REPLICAS = std::stoi(std::string(getenv("REPLICAS")));
 int K_SAMPLE_SIZE = std::stoi(std::string(getenv("K_SAMPLE_SIZE")));
@@ -25,8 +31,21 @@ void QueryAnswerThread(worker& a, int local_port) {
 
 int main() {
     worker my_worker;
+//    std::string first_worker = "worker-envars-fieldref-statefulset-0";
+//    if (std::string(getenv("MY_POD_NAME")) == first_worker){
+//            std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+//    }
+
     std::thread query_answer_thread (QueryAnswerThread, std::ref(my_worker), PORT);
     std::thread query_answer_thread_2 (QueryAnswerThread, std::ref(my_worker), PORT_2);
+    std::thread query_answer_thread_3 (QueryAnswerThread, std::ref(my_worker), PORT_3);
+    std::thread query_answer_thread_4 (QueryAnswerThread, std::ref(my_worker), PORT_4);
+    std::thread query_answer_thread_5 (QueryAnswerThread, std::ref(my_worker), PORT_5);
+    std::thread query_answer_thread_6 (QueryAnswerThread, std::ref(my_worker), PORT_6);
+    std::thread query_answer_thread_7 (QueryAnswerThread, std::ref(my_worker), PORT_7);
+    std::thread query_answer_thread_8 (QueryAnswerThread, std::ref(my_worker), PORT_8);
+
+
     std::this_thread::sleep_for(std::chrono::milliseconds(20000));
 
     for (int i = 0; i < std::stoi(std::string(getenv("REPLICAS"))) ; ++i) {
@@ -36,18 +55,67 @@ int main() {
         auto addr = lookup_host(new_host.c_str());
         if (addr !=std::string(getenv("MY_POD_IP")) ) {
             ip_list.push_back(addr);
-//            for(int j = 0; j < BATCH_SIZE; j++) {
-            std::random_device rd;
-            std::mt19937 mt(rd());
-            std::uniform_real_distribution<double> dist(-10.0, 10.0);
-            int local_port = dist(mt) >= 0 ? PORT : PORT_2;
-//            auto new_addr = addr + std::to_string(j);
-            auto new_addr = addr + std::to_string(0);
-            socket_list[new_addr] = get_socket(addr, local_port);
-//                socket_list[new_addr] = get_socket(addr, PORT);
-            print_log("adding new host " + new_host + " with ip " + addr + "and port " + std::to_string(PORT));
-            print_log("added " + addr);
-//            }
+            for(int j = 0; j < BATCH_SIZE; j++) {
+                std::random_device rd;
+                std::mt19937 mt(rd());
+                std::uniform_real_distribution<double> dist(0, 81.0);
+                int local_port = PORT;
+                int mod = (int)dist(mt) % 8;
+                switch (mod) {
+                    case 0:
+                    {
+                        local_port = PORT;
+                        break;
+                    }
+                    case 1:
+                    {
+                        local_port = PORT_2;
+                        break;
+                    }
+                    case 2:
+                    {
+                        local_port = PORT_3;
+                        break;
+                    }
+                    case 3:
+                    {
+                        local_port = PORT_4;
+                        break;
+                    }
+                    case 4:
+                    {
+                        local_port = PORT_5;
+                        break;
+                    }
+                    case 5:
+                    {
+                        local_port = PORT_6;
+                        break;
+                    }
+                    case 6:
+                    {
+                        local_port = PORT_7;
+                        break;
+                    }
+                    case 7:
+                    {
+                        local_port = PORT_8;
+                        break;
+                    }
+                }
+                auto new_addr = addr + std::to_string(j);
+    //            auto new_addr = addr + std::to_string(0);
+                int fd = get_socket(addr, local_port);
+//                while(fd == -1){
+//                    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+//                    fd = get_socket(addr, local_port);
+//                }
+                socket_list[new_addr] =fd;
+    //                socket_list[new_addr] = get_socket(addr, PORT);
+                print_log("adding new host " + new_host + " with ip " + addr + "and port " + std::to_string(local_port));
+                print_log("added " + addr);
+
+            }
         } else{
             print_log("removed my ip " + addr);
         }
@@ -60,5 +128,11 @@ int main() {
     my_worker.run_snowflake();
     query_answer_thread.join();
     query_answer_thread_2.join();
+    query_answer_thread_3.join();
+    query_answer_thread_4.join();
+    query_answer_thread_5.join();
+    query_answer_thread_6.join();
+    query_answer_thread_7.join();
+    query_answer_thread_8.join();
     return 0;
 }

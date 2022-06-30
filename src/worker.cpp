@@ -19,7 +19,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #define PORT 8080
-#define NUMBER_OF_SOCKETS 300
+#define NUMBER_OF_SOCKETS 1000
 
 worker::worker(){
     int number_of_rounds = std::stoi(std::string(getenv("NUMBER_OF_ROUNDS")));
@@ -137,18 +137,21 @@ void worker::run_snowflake(){
     int number_of_rounds = std::stoi(std::string(getenv("NUMBER_OF_ROUNDS")));
 //    int acc = 0;
     for (int j = 0; j < number_of_rounds/BATCH_SIZE ; j++) {
-        auto start_batch = std::chrono::steady_clock::now();
-
-        if (j==1){
+//    for (int j = 0; j < number_of_rounds ; j++) {
+        if (j==300){
             start = std::chrono::steady_clock::now();
         }
+
+        auto start_batch = std::chrono::steady_clock::now();
+//        run_snowflake_loop(this, j, ip_list);
+
         for (int i = 0; i < BATCH_SIZE ; ++i) {
-//            snowflake_threads.emplace_back(run_snowflake_loop, this, j*BATCH_SIZE+i, ip_list);
-            run_snowflake_loop(this, j*BATCH_SIZE+i, ip_list);
+            snowflake_threads.emplace_back(run_snowflake_loop, this, j*BATCH_SIZE+i, ip_list);
+//            run_snowflake_loop(this, j*BATCH_SIZE+i, ip_list);
         }
-//        for (auto & loop_thread: snowflake_threads) {
-//            loop_thread.join();
-//        }
+        for (auto & loop_thread: snowflake_threads) {
+            loop_thread.join();
+        }
 
         auto end_batch = std::chrono::steady_clock::now();
         std::cout << "Elapsed time - batch: "
@@ -164,6 +167,8 @@ void worker::run_snowflake(){
               << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()
               << " ms" << std::endl;
 //    std::cout << "Wasted round is: " << std::to_string(acc) << std::endl;
+
+    print_csv(std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()));
 
     for (int j = 0; j < number_of_rounds ; j++) {
         accept_round(j);

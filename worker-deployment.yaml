@@ -60,7 +60,7 @@ spec:
                   apiVersion: v1
                   fieldPath: spec.serviceAccountName
             - name: NUMBER_OF_ROUNDS
-              value: "10"
+              value: "2000"
             - name: K_SAMPLE_SIZE
               value: "10"
             - name: ALPHA
@@ -75,10 +75,18 @@ spec:
               value: ""
             - name: AWS_REGION
               value: "eu-central-1"
-          resources: {}
+            - name: BATCH_SIZE
+              value: "5"
+          resources:
+            limits:
+              memory: 8000Mi
+              cpu: "4"
+            requests:
+              memory:  8000Mi
+              cpu: "4"
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
-          #imagePullPolicy: IfNotPresent
+#          imagePullPolicy: IfNotPresent
           imagePullPolicy: Always
       restartPolicy: Always
       terminationGracePeriodSeconds: 2

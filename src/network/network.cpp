@@ -25,8 +25,10 @@
 #include <arpa/inet.h>
 #define PORT 8080
 #define PORT_2 8081
+#define PORT_3 8083
+#define PORT_4 8084
 
-int BATCH_SIZE = 2;
+int BATCH_SIZE = std::stoi(std::string(getenv("BATCH_SIZE")));
 std::vector<std::string> host_list;
 std::vector<std::string> ip_list;
 std::map<std::string, int> socket_list;
@@ -102,9 +104,9 @@ std::vector<std::string> Sample(int k_sample_size, std::vector<std::string> & lo
 }
 
 color_t query_recv(std::string addr, int round_number) {
-//    auto new_addr = addr + std::to_string(round_number % BATCH_SIZE);
+    auto new_addr = addr + std::to_string(round_number % BATCH_SIZE);
 
-    auto new_addr = addr + std::to_string(0);
+//    auto new_addr = addr + std::to_string(0);
 
     int sock = socket_list.at(new_addr);
     //srand(time(0));
@@ -117,8 +119,8 @@ color_t query_recv(std::string addr, int round_number) {
 }
 
 void query_send(std::string addr, int round_number) {
-//    auto new_addr = addr + std::to_string(round_number % BATCH_SIZE);
-    auto new_addr = addr + std::to_string(0);
+    auto new_addr = addr + std::to_string(round_number % BATCH_SIZE);
+//    auto new_addr = addr + std::to_string(0);
     int sock = socket_list.at(new_addr);
     //srand(time(0));
     //int local_port = rand() % 2 == 0 ? PORT : PORT_2;
@@ -185,7 +187,7 @@ int get_socket(std::string addr, int local_port){
     int sock = 0;
     struct sockaddr_in serv_addr;
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        printf("\n Socket creation error \n");
+//        printf("\n Socket creation error \n");
         return -1;
     }
     serv_addr.sin_family = AF_INET;
