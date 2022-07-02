@@ -18,6 +18,7 @@
 #define PORT_7 8087
 #define PORT_8 8088
 
+int KILL = std::stoi(std::string(getenv("KILL")));
 int REPLICAS = std::stoi(std::string(getenv("REPLICAS")));
 int K_SAMPLE_SIZE = std::stoi(std::string(getenv("K_SAMPLE_SIZE")));
 double ALPHA = std::stod(std::string(getenv("ALPHA")));
@@ -35,6 +36,12 @@ int main() {
 //    if (std::string(getenv("MY_POD_NAME")) == first_worker){
 //            std::this_thread::sleep_for(std::chrono::milliseconds(3000));
 //    }
+     for (int i =0 ; i< KILL; i++) {
+         std::string kill_worker = "worker-envars-fieldref-statefulset-" + std::to_string(i);
+         if (std::string(getenv("MY_POD_NAME")) == kill_worker) {
+             std::this_thread::sleep_for(std::chrono::milliseconds(3000000));
+         }
+     }
 
     std::thread query_answer_thread (QueryAnswerThread, std::ref(my_worker), PORT);
     std::thread query_answer_thread_2 (QueryAnswerThread, std::ref(my_worker), PORT_2);
@@ -46,7 +53,7 @@ int main() {
     std::thread query_answer_thread_8 (QueryAnswerThread, std::ref(my_worker), PORT_8);
 
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(20000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(25000));
 
     for (int i = 0; i < std::stoi(std::string(getenv("REPLICAS"))) ; ++i) {
         std::string new_host = "worker-envars-fieldref-statefulset-" + std::to_string(i) + ".worker.default.svc.cluster.local";
@@ -119,7 +126,6 @@ int main() {
         } else{
             print_log("removed my ip " + addr);
         }
-
     }
 
     print_log("started running pod: " + std::string(getenv("MY_POD_NAME")));
@@ -136,3 +142,12 @@ int main() {
     query_answer_thread_8.join();
     return 0;
 }
+
+//int main() {
+//    try {
+//        main_2();
+//    }
+//    catch (std::exception & e) {
+//
+//    }
+//}

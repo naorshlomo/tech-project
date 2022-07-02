@@ -118,7 +118,7 @@ color_t query_recv(std::string addr, int round_number) {
     return (color_t)(buffer[0] - '0');
 }
 
-void query_send(std::string addr, int round_number) {
+int query_send(std::string addr, int round_number) {
     auto new_addr = addr + std::to_string(round_number % BATCH_SIZE);
 //    auto new_addr = addr + std::to_string(0);
     int sock = socket_list.at(new_addr);
@@ -126,13 +126,26 @@ void query_send(std::string addr, int round_number) {
     //int local_port = rand() % 2 == 0 ? PORT : PORT_2;
     //int sock = get_socket(addr, local_port);
     //char buffer[1] = {0};
-    send(sock, std::to_string(round_number).c_str(), strlen(std::to_string(round_number).c_str()), 0);
+    int status_code = send(sock, std::to_string(round_number).c_str(), strlen(std::to_string(round_number).c_str()), MSG_NOSIGNAL);
+    return status_code;
 }
 
 std::map<std::string, color_t> QueryAll(std::vector<std::string> &sample_list, int round_number) {
-    std::map<std::string, color_t>  result;
+    std::map<std::string, color_t>  result={};
     for (auto addr: sample_list) {
-	    query_send(addr, round_number);
+        auto new_addr = addr + std::to_string(round_number % BATCH_SIZE);
+        int sock = socket_list.at(new_addr);
+        if (sock == -1) {
+            int fd = get_socket(addr, PORT);
+            socket_list[new_addr] = fd;
+            return result;
+        }
+    }
+    for (auto addr: sample_list) {
+	    int status_code = query_send(addr, round_number);
+        if (status_code == -1){
+            return result;
+        }
     }
     for (auto addr: sample_list) {
         auto query_result = query_recv(addr, round_number);
@@ -199,6 +212,7 @@ int get_socket(std::string addr, int local_port){
 
     if (connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
 //        printf("\nConnection Failed \n");
+        close(sock);
         return -1;
     }
     return sock;

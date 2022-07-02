@@ -64,9 +64,9 @@ spec:
             - name: K_SAMPLE_SIZE
               value: "10"
             - name: ALPHA
-              value: "0.7"
+              value: "0.8"
             - name: BETA
-              value: "8"
+              value: "20"
             - name : REPLICAS
               value: "100"
             - name: AWS_ACCESS_KEY
@@ -77,6 +77,8 @@ spec:
               value: "eu-central-1"
             - name: BATCH_SIZE
               value: "5"
+            - name: KILL
+              value: "8"
           resources:
             limits:
               memory: 8000Mi
@@ -86,8 +88,8 @@ spec:
               cpu: "4"
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
-#          imagePullPolicy: IfNotPresent
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
+#          imagePullPolicy: Always
       restartPolicy: Always
       terminationGracePeriodSeconds: 2
       dnsPolicy: ClusterFirst

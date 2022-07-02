@@ -105,6 +105,9 @@ void run_snowflake_loop(worker *our_worker, int round_number, std::vector<std::s
     while (true){
         auto k_sample_list = Sample(K_SAMPLE_SIZE, local_ip_list);
         auto sample_results = QueryAll(k_sample_list, round_number);
+        if (sample_results.empty()){
+            continue;
+        }
         for (auto color : colors) {
             int count = CountSampleResults(sample_results, color);
             if (count >=  ALPHA * K_SAMPLE_SIZE){

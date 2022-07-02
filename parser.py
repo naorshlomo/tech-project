@@ -69,15 +69,24 @@ def build_dict(results_dict, number_of_rounds):
 
 def main():
     results_dict = {}
-    how_many = sys.argv[1]
-    number_of_rounds = sys.argv[2]
-    build_dict(results_dict, number_of_rounds )
+    how_many = int(sys.argv[1])
+    number_of_rounds = int(sys.argv[2])
+    build_dict(results_dict, number_of_rounds)
     files = get_files(how_many)
     times = []
+    counter = 0
     for output_file in files:
+        if os.stat(output_file).st_size == 0:
+            counter += 1
+            continue
         with open(output_file) as f:
             parse_data(results_dict, f, times)
     print(results_dict)
+    total_dis_agree = 0
+    for round in results_dict.values():
+        total_dis_agree += min(round.values())
+    perc = (total_dis_agree * 100) / ((how_many-counter)*number_of_rounds)
+    print(f"dis agree {perc}%")
     # plot(results_dict, int(how_many))
     df = pd.DataFrame(times)
     print(f"the avg is :{df.apply(np.average)}")
